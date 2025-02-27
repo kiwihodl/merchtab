@@ -5,7 +5,7 @@ import {
   TAGS,
 } from "../constants";
 import { isShopifyError } from "../type-guards";
-import { ensureStartWith } from "./utils";
+import { ensureStartWith } from "../utils";
 import {
   addToCartMutation,
   createCartMutation,

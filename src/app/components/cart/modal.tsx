@@ -4,7 +4,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useCart } from "./cart-context";
-import { createUrl } from "@/lib/shopify/utils";
+import { createUrl } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import Price from "../price";

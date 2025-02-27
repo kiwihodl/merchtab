@@ -3,7 +3,7 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { ListItem, type PathFilterItem } from ".";
 import Link from "next/link";
-import { createUrl } from "@/lib/shopify/utils";
+import { createUrl } from "@/lib/utils";
 import type { SortFilterItem } from "@/lib/constants";
 import clsx from "clsx";
 

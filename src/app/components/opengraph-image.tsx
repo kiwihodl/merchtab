@@ -31,7 +31,10 @@ export default async function OpengraphImage(
         {
           name: "Inter",
           data: await fetch(
-            new URL("../fonts/Inter-Bold.ttf", import.meta.url)
+            new URL(
+              "../fonts/Inter-VariableFont_opsz,wght.ttf",
+              import.meta.url
+            )
           ).then((res) => res.arrayBuffer()),
           style: "normal",
           weight: 700,
