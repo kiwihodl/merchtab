@@ -1,4 +1,4 @@
-import { CartItem } from "@/lib/shopify/types";
+import { CartItem } from "@/app/lib/shopify/types";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useFormState } from "react-dom";

@@ -10,7 +10,7 @@ export default async function OpengraphImage(
 ): Promise<ImageResponse> {
   const { title } = {
     ...{
-      title: process.env.SITE_NAME,
+      title: process.env.NEXT_PUBLIC_SITE_NAME,
     },
     ...props,
   };
@@ -27,16 +27,6 @@ export default async function OpengraphImage(
     {
       width: 1200,
       height: 630,
-      fonts: [
-        {
-          name: "Inter",
-          data: await fetch(
-            new URL("../fonts/Inter-VariableFont_opsz,wght.ttf", import.meta.url)
-          ).then((res) => res.arrayBuffer()),
-          style: "normal",
-          weight: 700,
-        },
-      ],
     }
   );
 }

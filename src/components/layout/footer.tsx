@@ -1,5 +1,5 @@
-import { getMenu } from "@/lib/shopify";
-import { Menu } from "@/lib/shopify/types";
+import { getMenu } from "@/app/lib/shopify";
+import { Menu } from "@/app/lib/shopify/types";
 import Link from "next/link";
 
 export default async function Footer() {

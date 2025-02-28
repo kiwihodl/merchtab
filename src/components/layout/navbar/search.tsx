@@ -1,5 +1,5 @@
 "use client";
-import { createUrl } from "@/lib/utils";
+import { createUrl } from "@/app/lib/utils";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useRouter, useSearchParams } from "next/navigation";
 

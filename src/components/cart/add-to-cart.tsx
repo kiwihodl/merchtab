@@ -1,6 +1,6 @@
 "use client";
 
-import { Product, ProductVariant } from "@/lib/shopify/types";
+import { Product, ProductVariant } from "@/app/lib/shopify/types";
 import { useProduct } from "../product/product-context";
 import { useCart } from "./cart-context";
 import { useFormState } from "react-dom";

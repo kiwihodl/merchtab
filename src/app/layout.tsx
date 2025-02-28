@@ -5,7 +5,7 @@ import { Navbar } from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { CartProvider } from "@/components/cart/cart-context";
 import { cookies } from "next/headers";
-import { getCart } from "@/lib/shopify";
+import { getCart } from "@/app/lib/shopify";
 
 const inter = Inter({ subsets: ["latin"] });
 

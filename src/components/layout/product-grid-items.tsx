@@ -1,4 +1,4 @@
-import { Product } from "@/lib/shopify/types";
+import { Product } from "@/app/lib/shopify/types";
 import Grid from "../grid";
 import Link from "next/link";
 import { GridTileImage } from "../grid/tile";

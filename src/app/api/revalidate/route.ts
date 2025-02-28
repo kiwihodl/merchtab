@@ -1,4 +1,4 @@
-import { revalidate } from "@/lib/shopify";
+import { revalidate } from "@/app/lib/shopify";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {

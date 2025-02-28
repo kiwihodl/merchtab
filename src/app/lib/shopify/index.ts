@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  HIDDEN_PRODUCT_TAG,
-  SHOPIFY_GRAPHQL_API_ENDPOINT,
-  TAGS,
-} from "../constants";
-import { isShopifyError } from "../shopify/type-guards";
+import { HIDDEN_PRODUCT_TAG, TAGS } from "../constants";
+import { isShopifyError } from "../type-guards";
 import { ensureStartWith } from "../utils";
 import {
   addToCartMutation,
@@ -52,14 +48,16 @@ import { headers } from "next/headers";
 import { revalidateTag } from "next/cache";
 import { getPageQuery, getPagesQuery } from "./queries/page";
 
-const domain = process.env.SHOPIFY_STORE_DOMAIN
-  ? ensureStartWith(process.env.SHOPIFY_STORE_DOMAIN, "https://")
+const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN
+  ? ensureStartWith(process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN, "https://")
   : "";
-const endpoint = `${domain}${SHOPIFY_GRAPHQL_API_ENDPOINT}`;
-const key = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+const endpoint = `${domain}/api/2024-07/graphql.json`;
+const key = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+
 type ExtractVariables<T> = T extends { variables: object }
   ? T["variables"]
   : never;
+
 export async function shopifyFetch<T>({
   cache = "force-cache",
   headers,
@@ -78,7 +76,7 @@ export async function shopifyFetch<T>({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Shopify-Storefront-Access-Token": key,
+        "X-Shopify-Storefront-Access-Token": key || "",
         ...headers,
       },
       body: JSON.stringify({
@@ -132,6 +130,7 @@ function reshapeImages(images: Connection<Image>, productTitle: string) {
     };
   });
 }
+
 function reshapeProduct(
   product: ShopifyProduct,
   filterHiddenProducts: boolean = true
@@ -151,6 +150,7 @@ function reshapeProduct(
     variants: removeEdgesAndNodes(variants),
   };
 }
+
 function reshapeProducts(products: ShopifyProduct[]) {
   const reshapedProducts = [];
 
@@ -166,6 +166,7 @@ function reshapeProducts(products: ShopifyProduct[]) {
 
   return reshapedProducts;
 }
+
 export async function getMenu(handle: string): Promise<Menu[]> {
   const res = await shopifyFetch<ShopifyMenuOperation>({
     query: getMenuQuery,
