@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata = {
   description:
@@ -49,7 +50,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <img
+          <Image
             src="/banner.png"
             width="1270"
             height="300"
@@ -81,7 +82,7 @@ export default function Home() {
                 className="group"
                 prefetch={false}
               >
-                <img
+                <Image
                   src="/womens-collection.png"
                   width="400"
                   height="500"
@@ -99,7 +100,7 @@ export default function Home() {
                 className="group"
                 prefetch={false}
               >
-                <img
+                <Image
                   src="/mens-collection.png"
                   width="400"
                   height="500"
@@ -113,7 +114,7 @@ export default function Home() {
             </div>
             <div className="grid gap-1">
               <Link href="/search/kids" className="group" prefetch={false}>
-                <img
+                <Image
                   src="/kids-collection.png"
                   width="400"
                   height="500"
@@ -127,7 +128,7 @@ export default function Home() {
             </div>
             <div className="grid gap-1">
               <Link href="/search/sales" className="group" prefetch={false}>
-                <img
+                <Image
                   src="/sales-collection.png"
                   width="400"
                   height="500"
@@ -144,7 +145,7 @@ export default function Home() {
       </section>
       <section className="w-full py-12 lg:py-7 bg-[url('/sale-backdrop.svg')] grid place-content-center">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
-          <img src="/sale-banner.svg" alt="sale footer banner" />
+          <Image src="/sale-banner.svg" alt="sale footer banner" />
           <div className="space-y-3 z-50">
             <div className="bg-white dark:bg-black">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight p-2">
