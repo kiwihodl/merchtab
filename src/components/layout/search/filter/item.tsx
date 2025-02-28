@@ -11,10 +11,11 @@ function PathFilterItem({ item }: { item: PathFilterItem }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const active = pathname === item.path;
-  const newParams = new URLSearchParams(searchParams.toString());
-  const DynamicTag = active ? "p" : Link;
+  const newParams = new URLSearchParams(searchParams?.toString() || ""); // Null check
 
   newParams.delete("q");
+
+  const DynamicTag = active ? "p" : Link;
 
   return (
     <li className="mt-2 flex text-black dark:text-white" key={item.title}>
@@ -34,10 +35,11 @@ function PathFilterItem({ item }: { item: PathFilterItem }) {
 }
 
 function SortFilterItem({ item }: { item: SortFilterItem }) {
-  const pathname = usePathname();
+  const pathnameRaw = usePathname();
   const searchParams = useSearchParams();
-  const active = searchParams.get("sort") === item.slug;
-  const q = searchParams.get("q");
+  const active = searchParams?.get("sort") === item.slug;
+  const q = searchParams?.get("q");
+  const pathname = pathnameRaw || "";
 
   const href = createUrl(
     pathname,

@@ -73,11 +73,14 @@ export function AddToCart({ product }: { product: Product }) {
   const finalVariant = variants.find(
     (variant) => variant.id === selectedVariantId
   )!;
+
   return (
     <form
       action={async () => {
-        addCartItem(finalVariant, product);
         await actionWithVariant();
+        if (!message) {
+          addCartItem(finalVariant, product);
+        }
       }}
     >
       <SubmitButton
@@ -85,7 +88,7 @@ export function AddToCart({ product }: { product: Product }) {
         selectedVariantId={selectedVariantId}
       />
       <p className="sr-only" role="status" aria-label="polite">
-        {message}
+        {message ?? ""}
       </p>
     </form>
   );

@@ -46,7 +46,7 @@ import {
 } from "./types";
 import { headers } from "next/headers";
 import { revalidateTag } from "next/cache";
-import { getPageQuery, getPagesQuery } from "./queries/page";
+import { getPageQuery, getPagesQuery } from "./queries/page-queries";
 
 const domain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN
   ? ensureStartWith(process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN, "https://")

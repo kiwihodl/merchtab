@@ -1,4 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
+
 import { usePathname, useSearchParams } from "next/navigation";
 import { ListItem } from ".";
 import { useEffect, useRef, useState } from "react";
@@ -29,7 +31,7 @@ export default function FilterItemDropDown({ list }: { list: ListItem[] }) {
     list.forEach((listItem: ListItem) => {
       if (
         ("path" in listItem && pathname === listItem.path) ||
-        ("slug" in listItem && searchParams.get("sort") === listItem.slug)
+        ("slug" in listItem && searchParams?.get("sort") === listItem.slug) 
       ) {
         setActive(listItem.title);
       }

@@ -28,7 +28,8 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
   const getInitialState = () => {
     const params: ProductState = {};
-    for (const [key, value] of searchParams.entries()) {
+    const entries = searchParams?.entries() || [];
+    for (const [key, value] of entries) {
       params[key] = value;
     }
     return params;

@@ -1,4 +1,5 @@
 "use client";
+
 import { CartItem } from "@/app/lib/shopify/types";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useFormState } from "react-dom";
@@ -30,7 +31,7 @@ export function DeleteItemButton({
         <XMarkIcon className="mx-[1px] h-4 w-4 text-white dark:text-black" />
       </button>
       <p aria-live="polite" className="sr-only" role="status">
-        {message}
+        {message ?? ""}
       </p>
     </form>
   );

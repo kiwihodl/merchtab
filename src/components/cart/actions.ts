@@ -19,7 +19,7 @@ export async function addItem(
   let cartId = cookies().get("cartId")?.value;
 
   if (!cartId || !selectedVariantId) {
-    return "Error adding item to cart";
+    throw new Error("Error adding item to cart");
   }
 
   try {
@@ -28,7 +28,7 @@ export async function addItem(
     ]);
     revalidateTag(TAGS.cart);
   } catch (error) {
-    return "Error adding item to cart";
+    throw new Error("Error adding item to cart");
   }
 }
 
@@ -41,7 +41,7 @@ export async function updateItemQuantity(
 ) {
   let cartId = cookies().get("cartId")?.value;
   if (!cartId) {
-    return "Missing cart ID";
+    throw new Error("Missing cart ID");
   }
 
   const { merchandiseId, quantity } = payload;
@@ -49,7 +49,7 @@ export async function updateItemQuantity(
   try {
     const cart = await getCart(cartId);
     if (!cart) {
-      return "Error fetching cart";
+      throw new Error("Error fetching cart");
     }
 
     const lineItem = cart.lines.find(
@@ -76,7 +76,7 @@ export async function updateItemQuantity(
     revalidateTag(TAGS.cart);
   } catch (error) {
     console.error(error);
-    return "Error updating item quantity";
+    throw new Error("Error updating item quantity");
   }
 }
 
@@ -84,13 +84,13 @@ export async function removeItem(prevState: any, merchandiseId: string) {
   let cartId = cookies().get("cartId")?.value;
 
   if (!cartId) {
-    return "Missing cart ID";
+    throw new Error("Missing cart ID");
   }
 
   try {
     const cart = await getCart(cartId);
     if (!cart) {
-      return "Error fetching cart";
+      throw new Error("Error fetching cart");
     }
 
     const lineItem = cart.lines.find(
@@ -101,24 +101,22 @@ export async function removeItem(prevState: any, merchandiseId: string) {
       await removeFromCart(cartId, [lineItem.id]);
       revalidateTag(TAGS.cart);
     } else {
-      return "Item not found in cart";
+      throw new Error("Item not found in cart");
     }
   } catch (error) {
-    return "Error removing item from cart";
+    throw new Error("Error removing item from cart");
   }
 }
 
-export async function redirectToCheckout() {
-  let cartId = cookies().get("cartId")?.value;
-
+export async function redirectToCheckout(formData: FormData): Promise<void> {
+  const cartId = formData.get("cartId")?.toString();
   if (!cartId) {
-    return "Missing cart ID";
+    throw new Error("Missing cart ID");
   }
 
-  let cart = await getCart(cartId);
-
-  if (!cart) {
-    return "Error fetching cart";
+  const cart = await getCart(cartId);
+  if (!cart || !cart.checkoutUrl) {
+    throw new Error("Error fetching cart or missing checkout URL");
   }
 
   redirect(cart.checkoutUrl);

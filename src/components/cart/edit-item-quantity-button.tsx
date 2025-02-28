@@ -1,3 +1,5 @@
+"use client";
+
 import { CartItem } from "@/app/lib/shopify/types";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
@@ -42,6 +44,7 @@ export function EditItemQuantityButton({
     quantity: type === "plus" ? item.quantity + 1 : item.quantity - 1,
   };
   const actionWithVariant = formAction.bind(null, payload);
+
   return (
     <form
       action={async () => {
@@ -51,7 +54,7 @@ export function EditItemQuantityButton({
     >
       <SubmitButton type={type} />
       <p aria-label="polite" className="sr-only" role="status">
-        {message}
+        {message ?? ""}
       </p>
     </form>
   );
