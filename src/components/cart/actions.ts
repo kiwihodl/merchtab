@@ -108,17 +108,32 @@ export async function removeItem(prevState: any, merchandiseId: string) {
   }
 }
 
+// export async function redirectToCheckout(formData: FormData): Promise<void> {
+//   const cartId = formData.get("cartId")?.toString();
+//   if (!cartId) {
+//     throw new Error("Missing cart ID");
+//   }
+
+//   const cart = await getCart(cartId);
+//   if (!cart || !cart.checkoutUrl) {
+//     throw new Error("Error fetching cart or missing checkout URL");
+//   }
+
+//   redirect(cart.checkoutUrl);
+// }
+
 export async function redirectToCheckout(formData: FormData): Promise<void> {
-  const cartId = formData.get("cartId")?.toString();
+  const cartId =
+    formData.get("cartId")?.toString() || cookies().get("cartId")?.value;
+    console.log("formData cartId:", formData.get("cartId"));
+    console.log("cookie cartId:", cookies().get("cartId")?.value);
   if (!cartId) {
     throw new Error("Missing cart ID");
   }
-
   const cart = await getCart(cartId);
   if (!cart || !cart.checkoutUrl) {
     throw new Error("Error fetching cart or missing checkout URL");
   }
-
   redirect(cart.checkoutUrl);
 }
 
