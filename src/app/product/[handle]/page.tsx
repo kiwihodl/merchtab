@@ -9,6 +9,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 export async function generateMetadata({
   params,
@@ -58,46 +59,71 @@ export default async function ProductPage({
   return (
     <ProductProvider>
       <div className="mx-auto max-w-screen-2xl px-4">
-        <div className="flex flex-col rounded-lg border border-neutral-200 bg-white p-8 md:p-12 lg:flex-row lg:gap-8 dark:border-neutral-800 dark:bg-black">
-          <div className="h-full w-full basis-full lg:basis-4/6">
-            <Suspense
-              fallback={
-                <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden" />
-              }
+        <div className="flex flex-col rounded-2xl bg-black p-8 md:p-12">
+          <div className="flex items-center mb-8 gap-4 lg:hidden">
+            <Link
+              href="/"
+              className="text-white hover:text-accent transition-colors"
+              aria-label="Back to shop"
             >
-              <Gallery
-                images={product.images.slice(0, 5).map((image: Image) => ({
-                  src: image.url,
-                  altText: image.altText,
-                }))}
-              />
-            </Suspense>
+              <ArrowLeftIcon className="h-6 w-6" />
+            </Link>
+            <h1 className="text-5xl font-medium text-white text-center flex-1">
+              {product.title}
+            </h1>
           </div>
-          <div className="basis-full lg:basis-2/6">
-            <Suspense fallback={null}>
-              <ProductDescription product={product} />
-            </Suspense>
+          <div className="flex flex-col lg:flex-row lg:gap-8">
+            <div className="h-full w-full basis-full lg:basis-4/6 lg:relative">
+              <div className="hidden lg:block lg:absolute lg:-left-12 lg:top-2">
+                <Link
+                  href="/"
+                  className="text-white hover:text-accent transition-colors"
+                  aria-label="Back to shop"
+                >
+                  <ArrowLeftIcon className="h-6 w-6" />
+                </Link>
+              </div>
+              <Suspense
+                fallback={
+                  <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden rounded-2xl" />
+                }
+              >
+                <Gallery
+                  images={product.images.slice(0, 5).map((image: Image) => ({
+                    src: image.url,
+                    altText: image.altText,
+                  }))}
+                />
+              </Suspense>
+            </div>
+            <div className="basis-full lg:basis-2/6">
+              <Suspense fallback={null}>
+                <ProductDescription product={product} showTitle={false} />
+              </Suspense>
+            </div>
           </div>
         </div>
-        <RelatedPRoducts id={product.id} />
+        <RelatedProducts id={product.id} />
       </div>
     </ProductProvider>
   );
 }
 
-async function RelatedPRoducts({ id }: { id: string }) {
+async function RelatedProducts({ id }: { id: string }) {
   const relatedProducts = await getProductRecommendations(id);
 
   if (!relatedProducts) return null;
 
   return (
     <div className="py-8">
-      <h2 className="mb-4 text-2xl font-bold">Related Products</h2>
+      <h2 className="mb-4 text-2xl font-bold text-white text-center">
+        Related Products
+      </h2>
       <ul className="flex w-full gap-4 overflow-x-auto pt-1">
         {relatedProducts.map((product) => (
           <li
             key={product.handle}
-            className="aspect-square w-full flex-none min-[475px]:w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5"
+            className="aspect-square w-full flex-none min-[475px]:w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 hover:border-accent"
           >
             <Link
               className="relative h-full w-full"
@@ -110,6 +136,7 @@ async function RelatedPRoducts({ id }: { id: string }) {
                   title: product.title,
                   amount: product.priceRange.maxVariantPrice.amount,
                   currencyCode: product.priceRange.maxVariantPrice.currencyCode,
+                  position: "center",
                 }}
                 src={product.featuredImage?.url}
                 fill

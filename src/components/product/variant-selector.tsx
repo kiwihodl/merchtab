@@ -1,8 +1,9 @@
 "use client";
 
 import { ProductOption, ProductVariant } from "@/app/lib/shopify/types";
-import { useProduct, useUpdateURL } from "./product-context";
+import { useProduct } from "./product-context";
 import clsx from "clsx";
+import React from "react";
 
 type Combination = {
   id: string;
@@ -18,7 +19,18 @@ export default function VariantSelector({
   variants: ProductVariant[];
 }) {
   const { state, updateOption } = useProduct();
-  const updateURL = useUpdateURL();
+
+  // Set default size to M if available
+  React.useEffect(() => {
+    const sizeOption = options.find((opt) => opt.name.toLowerCase() === "size");
+    if (sizeOption) {
+      const mediumSize = sizeOption.values.find((v) => v.toLowerCase() === "m");
+      if (mediumSize && !state["size"]) {
+        updateOption("size", mediumSize);
+      }
+    }
+  }, [options, state, updateOption]);
+
   const hasNoOptionsOrJustOneOption =
     !options.length ||
     (options.length === 1 && options[0]?.values.length === 1);
@@ -40,53 +52,43 @@ export default function VariantSelector({
   }));
 
   return options.map((option) => (
-    <form key={option.id}>
-      <dl className="mb-8">
-        <dt className="mb-4 text-sm uppercase tracking-wide">{option.name}</dt>
-        <dd className="flex flex-wrap gap-3">
+    <form key={option.id} onSubmit={(e) => e.preventDefault()}>
+      <dl className="mb-8 flex flex-col items-center lg:items-start">
+        <dt className="mb-4 text-lg uppercase tracking-wide text-black dark:text-white">
+          {option.name}
+        </dt>
+        <dd className="flex flex-wrap justify-center lg:justify-start gap-3">
           {option.values.map((value) => {
             const optionNameLowerCase = option.name.toLowerCase();
 
-            // Base option params on current selectedOptions so we can preserve any other param state
-            const optionParams = { ...state, [optionNameLowerCase]: value };
+            const isAvailableForSale = combinations.find((combination) => {
+              if (!combination.availableForSale) return false;
+              return combination[optionNameLowerCase] === value;
+            });
 
-            // Filter out invalid options and check if the options combination is available for sale
-            const filtered = Object.entries(optionParams).filter(
-              ([key, value]) =>
-                options.find(
-                  (option) =>
-                    option.name.toLowerCase() === key &&
-                    option.values.includes(value)
-                )
-            );
-
-            const isAvailableForSale = combinations.find((combination) =>
-              filtered.every(
-                ([key, value]) =>
-                  combination[key] === value && combination.availableForSale
-              )
-            );
-
-            // The option is active if it's in the selected options
             const isActive = state[optionNameLowerCase] === value;
 
             return (
               <button
-                formAction={() => {
-                  const newState = updateOption(optionNameLowerCase, value);
-                  updateURL(newState);
-                }}
+                type="button"
                 key={value}
                 aria-disabled={!isAvailableForSale}
                 disabled={!isAvailableForSale}
-                title={`${option.name} ${value}${!isAvailableForSale ? " (Out of Stock)" : ""}`}
+                title={`${option.name} ${value}${
+                  !isAvailableForSale ? " (Out of Stock)" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  updateOption(optionNameLowerCase, value);
+                }}
                 className={clsx(
-                  "flex min-w-[48px] items-center justify-center rounded-full border bg-neutral-100 px-2 py-1 text-sm dark:border-neutral-800 dark:bg-neutral-900",
+                  "flex min-w-[48px] items-center justify-center rounded-full border px-2 py-1 text-sm",
                   {
-                    "cursor-default ring-2 ring-blue-600": isActive,
-                    "ring-1 ring-transparent transition duration-300 ease-in-out hover:ring-blue-600":
+                    "cursor-default border-accent bg-accent text-black":
+                      isActive,
+                    "border-neutral-200 bg-neutral-100 text-black hover:border-accent dark:border-neutral-800 dark:bg-neutral-900 dark:text-white":
                       !isActive && isAvailableForSale,
-                    "relative z-10 cursor-not-allowed overflow-hidden bg-neutral-100 text-neutral-500 ring-1 ring-neutral-300 before:absolute before:inset-x-0 before:-z-10 before:h-px before:-rotate-45 before:bg-neutral-300 before:transition-transform dark:bg-neutral-900 dark:text-neutral-400 dark:ring-neutral-700 before:dark:bg-neutral-700":
+                    "relative z-10 cursor-not-allowed overflow-hidden border-neutral-300 bg-neutral-100 text-neutral-500 before:absolute before:inset-x-0 before:-z-10 before:h-px before:-rotate-45 before:bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 before:dark:bg-neutral-700":
                       !isAvailableForSale,
                   }
                 )}

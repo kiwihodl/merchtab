@@ -23,6 +23,7 @@ export default function ProductGridItems({
                 title: product.title,
                 amount: product.priceRange.maxVariantPrice.amount,
                 currencyCode: product.priceRange.maxVariantPrice.currencyCode,
+                position: "center",
               }}
               src={product.featuredImage?.url}
               fill

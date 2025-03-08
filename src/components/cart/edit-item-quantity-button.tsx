@@ -3,27 +3,29 @@
 import { CartItem } from "@/app/lib/shopify/types";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useFormState } from "react-dom";
+import { useFormStatus } from "react-dom";
 import { updateItemQuantity } from "./actions";
+import { useFormState } from "react-dom";
 
 function SubmitButton({ type }: { type: "plus" | "minus" }) {
+  const { pending } = useFormStatus();
+
   return (
     <button
       type="submit"
-      aria-label={
-        type === "plus" ? "Increase item quantity" : "Reduce item quantity"
-      }
       className={clsx(
-        "ease flex h-full min-w-[36px] max-w-[36px] flex-none items-center justify-center rounded-full p-2 transition-all duration-200 hover:border-neutral-800 hover:opacity-80",
+        "ease flex h-full min-w-[32px] max-w-[32px] flex-none items-center justify-center px-2",
         {
-          "ml-auto": type === "minus",
+          "cursor-not-allowed": pending,
+          "hover:opacity-50": !pending,
         }
       )}
+      disabled={pending}
     >
-      {type === "plus" ? (
-        <PlusIcon className="h-4 w-4 dark:text-neutral-500" />
+      {type === "minus" ? (
+        <MinusIcon className="h-4 w-4 text-black dark:text-white" />
       ) : (
-        <MinusIcon className="h-4 w-4 dark:text-neutral-500" />
+        <PlusIcon className="h-4 w-4 text-black dark:text-white" />
       )}
     </button>
   );

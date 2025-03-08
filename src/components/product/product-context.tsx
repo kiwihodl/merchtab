@@ -25,6 +25,7 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 export function ProductProvider({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const getInitialState = () => {
     const params: ProductState = {};
@@ -44,15 +45,21 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   );
 
   const updateOption = (name: string, value: string) => {
-    const newState = { [name]: value };
+    const newState = { ...state, [name]: value };
     setOptimisticState(newState);
-    return { ...state, ...newState };
+    const params = new URLSearchParams(searchParams?.toString());
+    params.set(name, value);
+    router.push(`?${params.toString()}`, { scroll: false });
+    return newState;
   };
 
   const updateImage = (index: string) => {
-    const newState = { image: index };
+    const newState = { ...state, image: index };
     setOptimisticState(newState);
-    return { ...state, ...newState };
+    const params = new URLSearchParams(searchParams?.toString());
+    params.set("image", index);
+    router.push(`?${params.toString()}`, { scroll: false });
+    return newState;
   };
 
   const value = useMemo(
@@ -61,7 +68,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       updateOption,
       updateImage,
     }),
-    [state]
+    [state, searchParams]
   );
 
   return (

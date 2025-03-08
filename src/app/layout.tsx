@@ -22,11 +22,11 @@ export default async function RootLayout({
   const cartId = cookies().get("cartId")?.value;
   const cart = getCart(cartId);
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className="dark">
+      <body className={`${inter.className} bg-black text-white`}>
         <CartProvider cartPromise={cart}>
           <Navbar />
-          {children}
+          <main className="min-h-screen">{children}</main>
           <Footer />
         </CartProvider>
       </body>

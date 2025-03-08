@@ -21,22 +21,19 @@ export default function Search() {
       newParams.delete("q");
     }
 
-    router.push(createUrl("/search", newParams));
+    router.push(createUrl("/", newParams));
   }
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="w-max-[550px] relative w-full lg:w-80 xl:w-full"
-    >
+    <form onSubmit={onSubmit} className="w-full max-w-[200px] relative">
       <input
         key={searchParams?.get("q")}
         type="text"
         name="search"
-        placeholder="Search for products..."
+        placeholder="Search..."
         autoComplete="off"
         defaultValue={searchParams?.get("q") || ""}
-        className="text-md w-full rounded-lg border bg-white px-4 py-2 text-black placeholder:text-neutral-500 md:text-sm dark:border-neutral-800 dark:bg-transparent dark:text-white dark:placeholder:text-neutral-400"
+        className="w-full rounded-2xl border border-accent bg-white px-4 py-2 text-sm text-black placeholder:text-neutral-500 dark:border-accent dark:bg-transparent dark:text-white dark:placeholder:text-neutral-400 focus:border-accent focus:outline-none focus:ring-0"
       />
       <div className="absolute right-0 top-0 mr-3 flex h-full items-center">
         <MagnifyingGlassIcon className="h-4" />
@@ -47,11 +44,11 @@ export default function Search() {
 
 export function SearchSkeleton() {
   return (
-    <form className="w-max-[550px] relative w-full lg:w-80 xl:w-full">
+    <form className="w-full max-w-[200px] relative">
       <input
         type="text"
-        placeholder="Search for products..."
-        className="w-full rounded-lg border bg-white px-4 py-2 text-sm text-black placeholder:text-neutral-500 dark:border-neutral-800 dark:bg-transparent dark:text-white dark:placeholder:text-neutral-400"
+        placeholder="Search..."
+        className="w-full rounded-2xl border border-accent bg-white px-4 py-2 text-sm text-black placeholder:text-neutral-500 dark:border-accent dark:bg-transparent dark:text-white dark:placeholder:text-neutral-400 focus:border-accent focus:outline-none focus:ring-0"
       />
       <div className="absolute right-0 top-0 mr-3 flex h-full items-center">
         <MagnifyingGlassIcon className="h-4" />
