@@ -1,4 +1,4 @@
-import { getCollections } from "@/app/lib/shopify";
+import { getCollections, getCollectionProducts } from "@/app/lib/shopify";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -30,6 +30,7 @@ export async function GET() {
             return {
               ...collection,
               hasProducts: products.length > 0,
+              products,
             };
           } catch (error) {
             console.error(
@@ -39,6 +40,7 @@ export async function GET() {
             return {
               ...collection,
               hasProducts: false,
+              products: [],
             };
           }
         })
