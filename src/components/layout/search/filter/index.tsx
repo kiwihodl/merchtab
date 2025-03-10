@@ -6,6 +6,7 @@ export type PathFilterItem = { title: string; path: string };
 export type ListItem = SortFilterItem | PathFilterItem;
 
 function FilterItemList({ list }: { list: ListItem[] }) {
+  console.log("FilterItemList is being rendered with list:", list);
   return (
     <>
       {list.map((item: ListItem, i) => (
@@ -22,21 +23,20 @@ export default function FilterList({
   list: ListItem[];
   title?: string;
 }) {
+  console.log(
+    "FilterList is being rendered with title:",
+    title,
+    "and list:",
+    list
+  );
   return (
-    <>
-      <nav>
-        {title ? (
-          <h3 className="hidden text-xs text-neutral-500 md:block dark:text-neutral-400">
-            {title}
-          </h3>
-        ) : null}
-        <ul className="hidden md:block">
-          <FilterItemList list={list} />
-        </ul>
-        <ul className="md:hidden">
-          <FilterItemDropDown list={list} />
-        </ul>
-      </nav>
-    </>
+    <nav className="w-full">
+      {title ? (
+        <h3 className="text-lg font-medium text-accent mb-4">{title}</h3>
+      ) : null}
+      <ul className="w-full">
+        <FilterItemList list={list} />
+      </ul>
+    </nav>
   );
 }

@@ -11,16 +11,21 @@ function PathFilterItem({ item }: { item: PathFilterItem }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const active = pathname === item.path;
-  const newParams = new URLSearchParams(searchParams?.toString() || "");
+  const q = searchParams?.get("q");
 
-  newParams.delete("q");
+  const href = createUrl(
+    item.path,
+    new URLSearchParams({
+      ...(q && { q }),
+    })
+  );
 
   const DynamicTag = active ? "p" : Link;
 
   return (
     <li className="mt-4 flex text-neutral-300" key={item.title}>
       <DynamicTag
-        href={createUrl(item.path, newParams)}
+        href={href}
         className={clsx("w-fit text-xl font-medium hover:text-neutral-100", {
           "border-b-2 border-accent": active,
         })}
@@ -48,12 +53,12 @@ function SortFilterItem({ item }: { item: SortFilterItem }) {
   const DynamicTag = active ? "p" : Link;
 
   return (
-    <li className="mt-2 flex text-sm text-neutral-300" key={item.title}>
+    <li className="mt-4 flex text-neutral-300" key={item.title}>
       <DynamicTag
         prefetch={!active ? false : undefined}
         href={href}
-        className={clsx("w-fit hover:text-neutral-100", {
-          "border-b border-accent": active,
+        className={clsx("w-fit text-xl font-medium hover:text-neutral-100", {
+          "border-b-2 border-accent": active,
         })}
       >
         {item.title}

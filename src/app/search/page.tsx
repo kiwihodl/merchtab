@@ -4,8 +4,8 @@ import { defaultSort, sorting } from "@/app/lib/constants";
 import { getProducts } from "@/app/lib/shopify";
 
 export const metadata = {
-  title: "Shop - Sovereign University",
-  description: "Browse our collection of products.",
+  title: "Search Results - Sovereign University",
+  description: "Search results for products.",
 };
 
 export default async function SearchPage({
@@ -20,6 +20,7 @@ export default async function SearchPage({
 
   return (
     <div className="w-full px-6">
+      <h1 className="mb-4 text-2xl font-bold">Search Results</h1>
       {searchValue ? (
         <p className="mb-4 font-blinker">
           {products.length === 0
@@ -27,7 +28,9 @@ export default async function SearchPage({
             : `Showing ${products.length} ${products.length > 1 ? "results" : "result"} for `}
           <span className="font-bold">&quot;{searchValue}&quot;</span>
         </p>
-      ) : null}
+      ) : (
+        <p className="mb-4 font-blinker">Please enter a search term</p>
+      )}
 
       {products.length > 0 ? (
         <Grid className="grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">

@@ -11,14 +11,18 @@ export default function SearchLayout({
   return (
     <>
       <div className="mx-auto flex max-w-screen-2xl flex-col gap-8 px-4 pb-4 text-black md:flex-row dark:text-white">
-        <div className="order-first w-full flex-none md:max-w-[125px]">
-          <Collections />
+        <div className="order-first w-full flex-none md:w-[200px]">
+          <div className="bg-black p-4">
+            <FilterList list={sorting} title="Sort by" />
+            <div className="mt-8">
+              <div className="-mx-4 -mt-4">
+                <Collections />
+              </div>
+            </div>
+          </div>
         </div>
         <div className="order-last min-h-screen w-full md:order-none">
           {children}
-        </div>
-        <div className="order-none flex-none md:order-last md:w-[125px]">
-          <FilterList list={sorting} title="Sort by" />
         </div>
       </div>
     </>
