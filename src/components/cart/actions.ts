@@ -125,8 +125,6 @@ export async function removeItem(prevState: any, merchandiseId: string) {
 export async function redirectToCheckout(formData: FormData): Promise<void> {
   const cartId =
     formData.get("cartId")?.toString() || cookies().get("cartId")?.value;
-    console.log("formData cartId:", formData.get("cartId"));
-    console.log("cookie cartId:", cookies().get("cartId")?.value);
   if (!cartId) {
     throw new Error("Missing cart ID");
   }
@@ -134,6 +132,16 @@ export async function redirectToCheckout(formData: FormData): Promise<void> {
   if (!cart || !cart.checkoutUrl) {
     throw new Error("Error fetching cart or missing checkout URL");
   }
+
+  // Ensure the checkout URL is using HTTPS and includes the correct domain
+  const checkoutUrl = new URL(cart.checkoutUrl);
+  if (checkoutUrl.hostname.includes("myshopify.com")) {
+    // Force HTTPS
+    checkoutUrl.protocol = "https:";
+    // Ensure any password protection tokens are preserved
+    redirect(checkoutUrl.toString());
+  }
+
   redirect(cart.checkoutUrl);
 }
 
