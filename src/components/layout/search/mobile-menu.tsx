@@ -16,7 +16,7 @@ export default function MobileMenu() {
   const [navHeight, setNavHeight] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const pathname = usePathname();
+  const pathname = usePathname() || "/search";
   const searchParams = useSearchParams();
 
   useEffect(() => {
