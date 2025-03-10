@@ -10,8 +10,8 @@ import { getCart } from "@/app/lib/shopify";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Sovereign University",
-  description: "Come and make it",
+  title: "MerchTab",
+  description: "A modern e-commerce frontend built with Next.js and Shopify",
 };
 
 export default async function RootLayout({
