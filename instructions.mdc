@@ -1,0 +1,236 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# PlebDevs Merch Store Integration Guide
+
+## Overview
+This merch store is designed to be embedded as a tab within the PlebDevs platform. It receives configuration from the parent PlebDevs application and renders a fully functional Shopify-powered merch store.
+
+## Current Implementation Status
+
+### ✅ Already Implemented
+1. **Shopify Integration**
+   - Shopify API client setup and configuration
+   - Product fetching and display
+   - Cart management system
+   - Checkout flow
+   - Basic API error handling
+
+2. **Core Components**
+   - Cart functionality with optimistic updates
+   - Product display and variants
+   - Collection handling
+   - Mobile-responsive design
+   - Dark/light mode support
+
+3. **Basic Theme Support**
+   - CSS variables system
+   - Dark/light mode toggle
+   - Responsive design
+
+## Remaining Implementation Requirements
+
+### 1. Configuration System
+```typescript
+interface PlebDevsConfig {
+  brand: {
+    name: string;
+    logo: string;
+  };
+  theme: {
+    colors: {
+      background: string;
+      text: string;
+      accent: string;
+    };
+  };
+  shopify: {
+    apiKey: string;
+    storeUrl: string;
+  };
+}
+```
+
+**Priority**: High
+**Timeline**: 3-4 days
+**Tasks**:
+1. Create configuration provider component
+2. Add configuration validation
+3. Create configuration loading utilities
+4. Implement configuration persistence
+
+### 2. Admin Interface
+**Priority**: High
+**Timeline**: 4-5 days
+**Tasks**:
+1. Build `/admin` route with:
+   - Brand settings form
+   - Color picker with live preview
+   - Shopify credentials manager
+2. Add configuration persistence
+3. Create preview system
+4. Implement validation and error handling
+
+### 3. PlebDevs Platform Integration
+**Priority**: High
+**Timeline**: 3-4 days
+**Tasks**:
+1. Build tab component wrapper
+2. Create event handlers for platform communication
+3. Implement configuration sync
+4. Add error boundaries and fallbacks
+
+### 4. Security Enhancements
+**Priority**: High
+**Timeline**: 2-3 days
+**Tasks**:
+1. Add API key rotation system
+2. Implement secure configuration storage
+3. Add CORS configuration
+4. Create security documentation
+
+### 5. Documentation
+**Priority**: Medium
+**Timeline**: 2-3 days
+**Tasks**:
+1. Update integration guide
+2. Create troubleshooting guide
+3. Add configuration examples
+4. Document security best practices
+
+## Updated Timeline
+
+### Week 1: Configuration Foundation
+- Build configuration system
+- Start admin interface development
+
+### Week 2: Admin & Integration
+- Complete admin interface
+- Implement PlebDevs platform integration
+
+### Week 3: Security & Documentation
+- Implement security enhancements
+- Create documentation
+- Testing and refinements
+
+Total Estimated Time: 14-19 days
+
+## Testing Requirements
+
+### 1. Configuration Tests
+- Verify configuration passing from PlebDevs platform
+- Test configuration persistence
+- Validate configuration updates
+
+### 2. Integration Tests
+- Test PlebDevs platform communication
+- Verify theme application
+- Check responsive behavior
+
+### 3. Security Tests
+- Test API key handling
+- Verify CORS configuration
+- Check secure storage
+
+## Deployment Checklist
+
+1. [ ] Configure environment variables
+2. [ ] Set up secure configuration storage
+3. [ ] Configure brand settings
+4. [ ] Test PlebDevs platform integration
+5. [ ] Verify theme integration
+6. [ ] Test configuration updates
+7. [ ] Verify mobile compatibility
+8. [ ] Check security measures
+9. [ ] Review documentation
+10. [ ] Deploy to staging
+
+## Support
+- Check the [PlebDevs documentation](mdc:https:/plebdevs-three.vercel.app)
+- Contact platform support
+- Review Shopify API documentation
+
+# PDR: Enhanced Cart Functionality with Optimistic Updates
+
+## Goal
+Implement a robust optimistic update system for cart operations that provides instant feedback while ensuring data consistency.
+
+## Current State
+- Basic optimistic UI for add/remove/update operations
+- No error handling for failed optimistic updates
+- Inconsistent loading states
+- No rollback mechanism
+- Cart totals don't update optimistically
+
+## Implementation Steps
+
+### 1. Enhanced Optimistic State Management (2 days)
+- Create a new `useOptimisticCart` hook
+- Implement shadow state for tracking pending operations
+- Add rollback capability for failed operations
+- Handle concurrent operations properly
+
+### 2. Error Handling and Recovery (1 day)
+- Implement error boundaries for cart operations
+- Add retry mechanism for failed requests
+- Create toast notifications for success/error states
+- Handle network errors gracefully
+
+### 3. Loading States and UI Feedback (1 day)
+- Add loading indicators for in-progress operations
+- Implement skeleton states for cart items
+- Show visual feedback for successful/failed operations
+- Add transition animations for cart updates
+
+### 4. Optimistic Cart Calculations (1 day)
+- Update cart totals optimistically
+- Handle tax calculations properly
+- Implement quantity limits optimistically
+- Add inventory checking
+
+### 5. Testing and Documentation (1 day)
+- Unit tests for optimistic operations
+- Integration tests for error scenarios
+- Documentation for optimistic update patterns
+- Performance testing for concurrent operations
+
+## Dependencies
+- Existing cart context and components
+- Server-side cart actions
+- Toast notification system
+
+## Risks and Mitigations
+- Risk: Data inconsistency between client and server
+  Mitigation: Implement version tracking for cart updates
+
+- Risk: Race conditions in concurrent updates
+  Mitigation: Add request queuing and operation batching
+
+- Risk: Poor performance with many items
+  Mitigation: Implement request debouncing and throttling
+
+## Timeline
+Total: 6 days
+- Enhanced State Management: Days 1-2
+- Error Handling: Day 3
+- Loading States: Day 4
+- Cart Calculations: Day 5
+- Testing and Documentation: Day 6
+
+## Success Metrics
+- 100% success rate for optimistic updates matching server state
+- < 100ms perceived latency for cart operations
+- Zero data inconsistencies after failed operations
+- 100% test coverage for optimistic update scenarios
+
+## Product Development Requirements (PDRs)
+
+### Cart and Checkout
+- [Cart Optimistic Updates](mdc:docs/features/cart-optimistic-updates.md)
+  - Status: Pending Implementation
+  - Priority: High
+  - Timeline: 6 days
+
+### Integration
