@@ -8,7 +8,6 @@ import clsx from "clsx";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { addItem } from "./actions";
 import { useTransition } from "react";
-import { Button } from "@/components/ui/button";
 
 function SubmitButton({
   availableForSale,

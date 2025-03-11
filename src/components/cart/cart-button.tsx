@@ -1,19 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { useCart } from "./cart-context";
-import { CartModal } from "./modal";
+import CartModal from "./modal";
 
 export function CartButton() {
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const { cart } = useCart();
 
   return (
     <>
-      <button
-        onClick={() => setIsCartOpen(true)}
-        className="relative flex h-11 w-11 items-center justify-center rounded-md border border-neutral-200 text-white transition-colors hover:border-neutral-300"
-      >
+      <div className="relative flex h-11 w-11 items-center justify-center rounded-md border border-neutral-200 text-white transition-colors hover:border-neutral-300">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="h-4"
@@ -33,8 +28,8 @@ export function CartButton() {
             {cart.totalQuantity}
           </div>
         ) : null}
-      </button>
-      <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      </div>
+      <CartModal />
     </>
   );
 }

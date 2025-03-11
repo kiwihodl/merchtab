@@ -157,7 +157,6 @@ export default function CartModal() {
                             <div className="absolute -left-3 -top-2.5 z-[9999]">
                               <DeleteItemButton
                                 item={item}
-                                optimisticUpdate={updateCartItem}
                                 disabled={isLoading}
                               />
                             </div>
@@ -232,17 +231,7 @@ export default function CartModal() {
                         </div>
                         <div className="mb-3 flex items-center justify-between border-b-[0.5px] border-accent pb-1 pt-1">
                           <p>Shipping</p>
-                          {cart.cost.totalShippingAmount?.amount ? (
-                            <Price
-                              className="text-right text-base text-black dark:text-white"
-                              amount={cart.cost.totalShippingAmount.amount}
-                              currencyCode={
-                                cart.cost.totalShippingAmount.currencyCode
-                              }
-                            />
-                          ) : (
-                            <p className="text-right">Calculated at checkout</p>
-                          )}
+                          <p className="text-right">Calculated at checkout</p>
                         </div>
                         <div className="mb-3 flex items-center justify-between border-b-[0.5px] border-accent pb-1 pt-1">
                           <p>Total</p>

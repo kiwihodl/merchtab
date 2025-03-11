@@ -16,7 +16,8 @@ export async function addItem(prevState: any, selectedVariantId: string) {
   let cartId = cookies().get("cartId")?.value;
 
   if (!selectedVariantId) {
-    throw new Error("Missing variant ID");
+    console.error("Missing variant ID");
+    return "Missing variant ID";
   }
 
   try {

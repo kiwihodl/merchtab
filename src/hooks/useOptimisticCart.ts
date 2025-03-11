@@ -99,22 +99,25 @@ export function useOptimisticCart(initialCart: Cart | undefined) {
     [pendingOperations]
   );
 
-  const addToCart = useCallback((variant: ProductVariant, product: Product) => {
-    const operation: Operation = {
-      type: "ADD",
-      payload: { variant, product },
-    };
-    addOptimisticOperation(operation);
-    setPendingOperations((prev) => [...prev, operation]);
+  const addToCart = useCallback(
+    (variant: ProductVariant, product: Product) => {
+      const operation: Operation = {
+        type: "ADD",
+        payload: { variant, product },
+      };
+      addOptimisticOperation(operation);
+      setPendingOperations((prev) => [...prev, operation]);
 
-    addItem(variant.id)
-      .then(() => {
-        setPendingOperations((prev) => prev.filter((op) => op !== operation));
-      })
-      .catch(() => {
-        setPendingOperations((prev) => prev.filter((op) => op !== operation));
-      });
-  }, []);
+      addItem(null, variant.id)
+        .then(() => {
+          setPendingOperations((prev) => prev.filter((op) => op !== operation));
+        })
+        .catch(() => {
+          setPendingOperations((prev) => prev.filter((op) => op !== operation));
+        });
+    },
+    [addOptimisticOperation]
+  );
 
   const updateQuantity = useCallback(
     (merchandiseId: string, quantity: number) => {
@@ -133,25 +136,28 @@ export function useOptimisticCart(initialCart: Cart | undefined) {
           setPendingOperations((prev) => prev.filter((op) => op !== operation));
         });
     },
-    []
+    [addOptimisticOperation]
   );
 
-  const removeFromCart = useCallback((merchandiseId: string) => {
-    const operation: Operation = {
-      type: "REMOVE",
-      payload: { merchandiseId },
-    };
-    addOptimisticOperation(operation);
-    setPendingOperations((prev) => [...prev, operation]);
+  const removeFromCart = useCallback(
+    (merchandiseId: string) => {
+      const operation: Operation = {
+        type: "REMOVE",
+        payload: { merchandiseId },
+      };
+      addOptimisticOperation(operation);
+      setPendingOperations((prev) => [...prev, operation]);
 
-    removeItem(null, merchandiseId)
-      .then(() => {
-        setPendingOperations((prev) => prev.filter((op) => op !== operation));
-      })
-      .catch(() => {
-        setPendingOperations((prev) => prev.filter((op) => op !== operation));
-      });
-  }, []);
+      removeItem(null, merchandiseId)
+        .then(() => {
+          setPendingOperations((prev) => prev.filter((op) => op !== operation));
+        })
+        .catch(() => {
+          setPendingOperations((prev) => prev.filter((op) => op !== operation));
+        });
+    },
+    [addOptimisticOperation]
+  );
 
   return {
     cart,
