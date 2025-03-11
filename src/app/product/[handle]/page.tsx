@@ -59,30 +59,21 @@ export default async function ProductPage({
   return (
     <ProductProvider>
       <div className="mx-auto max-w-screen-2xl px-4">
-        <div className="flex flex-col rounded-2xl bg-black p-8 md:p-12">
-          <div className="flex items-center mb-8 gap-4 lg:hidden">
-            <Link
-              href="/"
-              className="text-white hover:text-accent transition-colors"
-              aria-label="Back to shop"
-            >
-              <ArrowLeftIcon className="h-6 w-6" />
-            </Link>
-            <h1 className="text-5xl font-medium text-white text-center flex-1">
+        <div className="flex flex-col rounded-2xl bg-black p-8 md:p-12 relative">
+          <Link
+            href="/"
+            className="absolute -left-2 -top-4 p-4 text-white hover:text-accent transition-colors"
+            aria-label="Back to shop"
+          >
+            <ArrowLeftIcon className="h-6 w-6" />
+          </Link>
+          <div className="mb-8 lg:hidden">
+            <h1 className="text-5xl font-medium text-white text-center">
               {product.title}
             </h1>
           </div>
           <div className="flex flex-col lg:flex-row lg:gap-8">
-            <div className="h-full w-full basis-full lg:basis-4/6 lg:relative">
-              <div className="hidden lg:block lg:absolute lg:-left-12 lg:top-2">
-                <Link
-                  href="/"
-                  className="text-white hover:text-accent transition-colors"
-                  aria-label="Back to shop"
-                >
-                  <ArrowLeftIcon className="h-6 w-6" />
-                </Link>
-              </div>
+            <div className="h-full w-full basis-full lg:basis-4/6">
               <Suspense
                 fallback={
                   <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden rounded-2xl" />

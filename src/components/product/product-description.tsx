@@ -19,13 +19,16 @@ export function ProductDescription({
             {product.title}
           </h1>
         )}
-        <div className="w-auto min-w-[80px] rounded-full bg-accent px-4 py-2 text-sm text-black">
-          <Price
-            amount={product.priceRange.maxVariantPrice.amount}
-            currencyCode={product.priceRange.maxVariantPrice.currencyCode}
-            className="text-black text-center"
-            showCurrency={false}
-          />
+        <div className="flex items-center gap-4 w-full justify-center lg:justify-start">
+          <div className="text-lg text-accent">
+            <Price
+              amount={product.priceRange.maxVariantPrice.amount}
+              currencyCode={product.priceRange.maxVariantPrice.currencyCode}
+              className="text-accent"
+              showCurrency={false}
+            />
+          </div>
+          <AddToCart product={product} />
         </div>
       </div>
       <div className="flex flex-col items-center lg:items-start">
@@ -39,7 +42,6 @@ export function ProductDescription({
             html={product.descriptionHtml}
           />
         ) : null}
-        <AddToCart product={product} />
       </div>
     </>
   );
