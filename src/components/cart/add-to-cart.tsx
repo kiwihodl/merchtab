@@ -3,10 +3,7 @@
 import { Product, ProductVariant } from "@/app/lib/shopify/types";
 import { useProduct } from "../product/product-context";
 import { useCart } from "./cart-context";
-import { useFormState } from "react-dom";
 import clsx from "clsx";
-import { PlusIcon } from "@heroicons/react/24/outline";
-import { addItem } from "./actions";
 import { useTransition } from "react";
 
 function SubmitButton({
@@ -84,7 +81,6 @@ export function AddToCart({ product }: { product: Product }) {
   const handleSubmit = async (formData: FormData) => {
     startTransition(async () => {
       try {
-        await addItem(null, selectedVariantId);
         addCartItem(finalVariant, product);
       } catch (error) {
         console.error("Error adding item to cart:", error);
