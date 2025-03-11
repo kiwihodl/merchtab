@@ -125,7 +125,7 @@ export function useOptimisticCart(initialCart: Cart | undefined) {
       addOptimisticOperation(operation);
       setPendingOperations((prev) => [...prev, operation]);
 
-      updateItemQuantity(merchandiseId, quantity)
+      updateItemQuantity(null, merchandiseId, quantity)
         .then(() => {
           setPendingOperations((prev) => prev.filter((op) => op !== operation));
         })

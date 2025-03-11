@@ -39,22 +39,20 @@ export async function addItem(prevState: any, selectedVariantId: string) {
 
 export async function updateItemQuantity(
   prevState: any,
-  payload: {
-    merchandiseId: string;
-    quantity: number;
-  }
+  merchandiseId: string,
+  quantity: number
 ) {
   let cartId = cookies().get("cartId")?.value;
   if (!cartId) {
-    throw new Error("Missing cart ID");
+    const cart = await createCart();
+    cartId = cart.id;
+    cookies().set("cartId", cartId!);
   }
 
-  const { merchandiseId, quantity } = payload;
-
   try {
-    const cart = await getCart(cartId);
+    const cart = await getCart(cartId!);
     if (!cart) {
-      throw new Error("Error fetching cart");
+      throw new Error("Cart not found");
     }
 
     const lineItem = cart.lines.find(
@@ -63,9 +61,9 @@ export async function updateItemQuantity(
 
     if (lineItem && lineItem.id) {
       if (quantity === 0) {
-        await removeFromCart(cartId, [lineItem.id]);
+        await removeFromCart(cartId!, [lineItem.id]);
       } else {
-        await updateCart(cartId, [
+        await updateCart(cartId!, [
           {
             id: lineItem.id,
             merchandiseId,
@@ -74,14 +72,14 @@ export async function updateItemQuantity(
         ]);
       }
     } else if (quantity > 0) {
-      // If the item doesn't exist in the cart and quantity > 0, add it
-      await addToCart(cartId, [{ merchandiseId, quantity }]);
+      await addToCart(cartId!, [{ merchandiseId, quantity }]);
     }
 
     revalidateTag(TAGS.cart);
+    return null;
   } catch (error) {
     console.error(error);
-    throw new Error("Error updating item quantity");
+    return "Error updating item quantity";
   }
 }
 

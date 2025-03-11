@@ -12,14 +12,22 @@ function SubmitButton({
   onClick: () => void;
   disabled?: boolean;
 }) {
+  const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+  };
+
   return (
     <button
-      onClick={onClick}
+      type="button"
+      onClick={handleClick}
+      onTouchEnd={handleClick}
       className={clsx(
-        "ease flex h-full min-w-[32px] max-w-[32px] flex-none items-center justify-center",
+        "ease flex h-full min-w-[32px] max-w-[32px] flex-none items-center justify-center touch-manipulation",
         {
           "cursor-not-allowed opacity-50": disabled,
-          "hover:opacity-50": !disabled,
+          "hover:opacity-50 active:opacity-40": !disabled,
         }
       )}
       disabled={disabled}
@@ -65,11 +73,19 @@ export function EditItemQuantityButton({
 }) {
   const { updateCartItem } = useCart();
 
+  const handleQuantityChange = (type: "plus" | "minus") => {
+    updateCartItem(merchandiseId, type);
+  };
+
   return (
-    <div className="flex items-center">
+    <div 
+      className="flex items-center touch-manipulation" 
+      onClick={(e) => e.stopPropagation()}
+      onTouchEnd={(e) => e.stopPropagation()}
+    >
       <SubmitButton
         type="minus"
-        onClick={() => updateCartItem(merchandiseId, "minus")}
+        onClick={() => handleQuantityChange("minus")}
         disabled={disabled || quantity <= 1}
       />
       <p className="w-6 text-center">
@@ -77,7 +93,7 @@ export function EditItemQuantityButton({
       </p>
       <SubmitButton
         type="plus"
-        onClick={() => updateCartItem(merchandiseId, "plus")}
+        onClick={() => handleQuantityChange("plus")}
         disabled={disabled}
       />
     </div>

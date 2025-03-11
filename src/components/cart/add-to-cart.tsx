@@ -94,7 +94,7 @@ export function AddToCart({ product }: { product: Product }) {
   };
 
   return (
-    <form action={handleSubmit} method="POST">
+    <form action={handleSubmit}>
       <SubmitButton
         availableForSale={availableForSale}
         selectedVariantId={selectedVariantId}
