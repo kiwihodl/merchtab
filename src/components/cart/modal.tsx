@@ -22,7 +22,7 @@ type MerchandiseSearchParams = {
 };
 
 export default function CartModal() {
-  const { cart, updateCartItem } = useCart();
+  const { cart, updateCartItem, pendingOperations } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const quantityRef = useRef(cart?.totalQuantity);
   const openCart = () => setIsOpen(true);
@@ -47,6 +47,19 @@ export default function CartModal() {
       quantityRef.current = cart?.totalQuantity;
     }
   }, [isOpen, cart?.totalQuantity, quantityRef]);
+
+  const items = cart?.lines || [];
+  const subtotal = cart?.cost.subtotalAmount.amount || "0";
+  const tax = cart?.cost.totalTaxAmount.amount || "0";
+  const total = cart?.cost.totalAmount.amount || "0";
+
+  const isItemLoading = (merchandiseId: string) => {
+    return pendingOperations.some(
+      (op) =>
+        op.payload.merchandiseId === merchandiseId ||
+        (op.type === "ADD" && op.payload.variant.id === merchandiseId)
+    );
+  };
 
   return (
     <>
@@ -78,8 +91,23 @@ export default function CartModal() {
             <Dialog.Panel className="fixed bottom-0 right-0 top-0 flex h-full w-full flex-col border-l border-neutral-200 bg-white/80 p-6 text-black backdrop-blur-xl md:w-[390px] dark:border-neutral-700 dark:bg-black/80 dark:text-white">
               <div className="flex items-center justify-between">
                 <p className="text-lg font-semibold">My Cart</p>
-                <button aria-label="Close cart" onClick={closeCart}>
-                  <CloseCart />
+                <button
+                  aria-label="Close cart"
+                  onClick={closeCart}
+                  className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
+                >
+                  <span className="sr-only">Close</span>
+                  <svg
+                    className="h-6 w-6 text-gray-500"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
@@ -101,107 +129,103 @@ export default function CartModal() {
               ) : (
                 <div className="flex h-full flex-col justify-between overflow-hidden p-1">
                   <ul className="flex-grow overflow-auto py-4 overflow-visible px-3">
-                    {cart.lines
-                      .sort((a, b) =>
-                        a.merchandise.product.title.localeCompare(
-                          b.merchandise.product.title
-                        )
-                      )
-                      .map((item, i) => {
-                        const merchandiseSearchParams =
-                          {} as MerchandiseSearchParams;
+                    {items.map((item, i) => {
+                      const isLoading = isItemLoading(item.merchandise.id);
+                      const merchandiseSearchParams =
+                        {} as MerchandiseSearchParams;
 
-                        item.merchandise.selectedOptions.forEach(
-                          ({ name, value }) => {
-                            if (value !== DEFAULT_OPTION) {
-                              merchandiseSearchParams[
-                                name.toLocaleLowerCase()
-                              ] = value;
-                            }
+                      item.merchandise.selectedOptions.forEach(
+                        ({ name, value }) => {
+                          if (value !== DEFAULT_OPTION) {
+                            merchandiseSearchParams[name.toLocaleLowerCase()] =
+                              value;
                           }
-                        );
-                        const merchandiseUrl = createUrl(
-                          `/product/${item.merchandise.product.handle}`,
-                          new URLSearchParams(merchandiseSearchParams)
-                        );
+                        }
+                      );
+                      const merchandiseUrl = createUrl(
+                        `/product/${item.merchandise.product.handle}`,
+                        new URLSearchParams(merchandiseSearchParams)
+                      );
 
-                        return (
-                          <li
-                            key={i}
-                            className={`flex w-full flex-col pb-4 mb-4 relative ${i === 0 ? "mt-4" : ""}`}
-                          >
-                            <div className="absolute -left-3 -top-2.5 z-[9999]">
-                              <DeleteItemButton
+                      return (
+                        <li
+                          key={i}
+                          className={`flex w-full flex-col pb-4 mb-4 relative ${i === 0 ? "mt-4" : ""} ${isLoading ? "opacity-50" : ""}`}
+                        >
+                          <div className="absolute -left-3 -top-2.5 z-[9999]">
+                            <DeleteItemButton
+                              item={item}
+                              optimisticUpdate={updateCartItem}
+                              disabled={isLoading}
+                            />
+                          </div>
+                          <div className="flex justify-between items-start">
+                            <div className="flex flex-row space-x-4">
+                              <div className="relative h-[64px] w-[64px] min-w-[64px] min-h-[64px] overflow-hidden rounded-2xl border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900">
+                                <Image
+                                  className="h-full w-full object-cover rounded-2xl"
+                                  width={64}
+                                  height={64}
+                                  alt={
+                                    item.merchandise.product.featuredImage
+                                      .altText || item.merchandise.product.title
+                                  }
+                                  src={
+                                    item.merchandise.product.featuredImage.url
+                                  }
+                                />
+                              </div>
+                              <div className="flex flex-col">
+                                <Link
+                                  href={merchandiseUrl}
+                                  onClick={closeCart}
+                                  className="z-30"
+                                >
+                                  <div className="flex flex-col text-base max-w-[150px]">
+                                    <span className="leading-tight">
+                                      {item.merchandise.product.title}
+                                      {item.merchandise.title !==
+                                        DEFAULT_OPTION && (
+                                        <span className="text-black dark:text-white">
+                                          {" - "}
+                                          {item.merchandise.title}
+                                        </span>
+                                      )}
+                                    </span>
+                                  </div>
+                                </Link>
+                                <Price
+                                  className="text-sm text-black dark:text-white mt-1"
+                                  amount={item.cost.totalAmount.amount}
+                                  currencyCode={
+                                    item.cost.totalAmount.currencyCode
+                                  }
+                                />
+                              </div>
+                            </div>
+                            <div className="flex h-9 flex-row items-center rounded-full border border-accent">
+                              <EditItemQuantityButton
                                 item={item}
+                                type="minus"
                                 optimisticUpdate={updateCartItem}
+                                disabled={isLoading}
+                              />
+                              <p className="w-6 text-center">
+                                <span className="w-full text-sm text-black dark:text-white">
+                                  {item.quantity}
+                                </span>
+                              </p>
+                              <EditItemQuantityButton
+                                item={item}
+                                type="plus"
+                                optimisticUpdate={updateCartItem}
+                                disabled={isLoading}
                               />
                             </div>
-                            <div className="flex justify-between items-start">
-                              <div className="flex flex-row space-x-4">
-                                <div className="relative h-[64px] w-[64px] min-w-[64px] min-h-[64px] overflow-hidden rounded-2xl border border-neutral-300 bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900">
-                                  <Image
-                                    className="h-full w-full object-cover rounded-2xl"
-                                    width={64}
-                                    height={64}
-                                    alt={
-                                      item.merchandise.product.featuredImage
-                                        .altText ||
-                                      item.merchandise.product.title
-                                    }
-                                    src={
-                                      item.merchandise.product.featuredImage.url
-                                    }
-                                  />
-                                </div>
-                                <div className="flex flex-col">
-                                  <Link
-                                    href={merchandiseUrl}
-                                    onClick={closeCart}
-                                    className="z-30"
-                                  >
-                                    <div className="flex flex-col text-base max-w-[150px]">
-                                      <span className="leading-tight">
-                                        {item.merchandise.product.title}
-                                        {item.merchandise.title !==
-                                          DEFAULT_OPTION && (
-                                          <span className="text-black dark:text-white">
-                                            {" - "}
-                                            {item.merchandise.title}
-                                          </span>
-                                        )}
-                                      </span>
-                                    </div>
-                                  </Link>
-                                  <Price
-                                    className="text-sm text-black dark:text-white mt-1"
-                                    amount={item.cost.totalAmount.amount}
-                                    currencyCode={
-                                      item.cost.totalAmount.currencyCode
-                                    }
-                                  />
-                                </div>
-                              </div>
-                              <div className="flex h-9 flex-row items-center rounded-full border border-accent">
-                                <EditItemQuantityButton
-                                  item={item}
-                                  type="minus"
-                                  optimisticUpdate={updateCartItem}
-                                />
-                                <p className="w-6 text-center">
-                                  <span className="w-full text-sm text-black dark:text-white">
-                                    {item.quantity}
-                                  </span>
-                                </p>
-                                <EditItemQuantityButton
-                                  item={item}
-                                  type="plus"
-                                  optimisticUpdate={updateCartItem}
-                                />
-                              </div>
-                            </div>
-                          </li>
-                        );
-                      })}
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
                   <div className="flex flex-col gap-3">
                     <div className="py-4 text-sm text-black dark:text-white">
@@ -209,7 +233,7 @@ export default function CartModal() {
                         <p>Taxes</p>
                         <Price
                           className="text-right text-base text-black dark:text-white"
-                          amount={cart.cost.totalTaxAmount.amount}
+                          amount={tax}
                           currencyCode={cart.cost.totalTaxAmount.currencyCode}
                         />
                       </div>
@@ -221,7 +245,7 @@ export default function CartModal() {
                         <p>Total</p>
                         <Price
                           className="text-right text-base text-black dark:text-white"
-                          amount={cart.cost.totalAmount.amount}
+                          amount={total}
                           currencyCode={cart.cost.totalAmount.currencyCode}
                         />
                       </div>

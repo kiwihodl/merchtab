@@ -7,13 +7,18 @@ import { useFormState } from "react-dom";
 import clsx from "clsx";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { addItem } from "./actions";
+import { useTransition } from "react";
 
 function SubmitButton({
   availableForSale,
   selectedVariantId,
+  isLoading,
+  isPending,
 }: {
   availableForSale: boolean;
   selectedVariantId: string | undefined;
+  isLoading: boolean;
+  isPending: boolean;
 }) {
   const buttonClasses =
     "relative flex w-full items-center justify-center rounded-full bg-accent p-4 tracking-wide text-black transition duration-theme-default hover:bg-accent/90";
@@ -40,6 +45,14 @@ function SubmitButton({
     );
   }
 
+  if (isLoading || isPending) {
+    return (
+      <button disabled className={clsx(buttonClasses, disabledClasses)}>
+        Adding...
+      </button>
+    );
+  }
+
   return (
     <button aria-label="Add to cart" className={buttonClasses}>
       Add To Cart
@@ -49,9 +62,10 @@ function SubmitButton({
 
 export function AddToCart({ product }: { product: Product }) {
   const { variants, availableForSale } = product;
-  const { addCartItem } = useCart();
+  const { addCartItem, pendingOperations, isPending } = useCart();
   const { state } = useProduct();
-  const [message, formAction] = useFormState(addItem, null);
+  const [isSubmitting, startTransition] = useTransition();
+
   const variant = variants.find((variant: ProductVariant) =>
     variant.selectedOptions.every(
       (option) => option.value === state[option.name.toLowerCase()]
@@ -59,27 +73,37 @@ export function AddToCart({ product }: { product: Product }) {
   );
   const defaultVariantId = variants.length === 1 ? variants[0]?.id : undefined;
   const selectedVariantId = variant?.id || defaultVariantId;
-  const actionWithVariant = formAction.bind(null, selectedVariantId);
   const finalVariant = variants.find(
     (variant) => variant.id === selectedVariantId
-  )!;
+  );
+
+  const isLoading = pendingOperations.some(
+    (op) => op.type === "ADD" && op.payload.variant?.id === selectedVariantId
+  );
+
+  if (!finalVariant || !selectedVariantId) {
+    return null;
+  }
+
+  const handleSubmit = async (formData: FormData) => {
+    startTransition(async () => {
+      try {
+        await addItem(null, selectedVariantId);
+        addCartItem(finalVariant, product);
+      } catch (error) {
+        console.error("Error adding item to cart:", error);
+      }
+    });
+  };
 
   return (
-    <form
-      action={async () => {
-        await actionWithVariant();
-        if (!message) {
-          addCartItem(finalVariant, product);
-        }
-      }}
-    >
+    <form action={handleSubmit}>
       <SubmitButton
         availableForSale={availableForSale}
         selectedVariantId={selectedVariantId}
+        isLoading={isLoading}
+        isPending={isPending || isSubmitting}
       />
-      <p className="sr-only" role="status" aria-label="polite">
-        {message ?? ""}
-      </p>
     </form>
   );
 }

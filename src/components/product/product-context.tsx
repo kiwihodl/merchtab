@@ -7,6 +7,7 @@ import React, {
   useContext,
   useMemo,
   useOptimistic,
+  useTransition,
 } from "react";
 
 type ProductState = {
@@ -17,8 +18,9 @@ type ProductState = {
 
 type ProductContextType = {
   state: ProductState;
-  updateOption: (name: string, value: string) => ProductState;
-  updateImage: (index: string) => ProductState;
+  updateOption: (name: string, value: string) => void;
+  updateImage: (index: string) => void;
+  isPending: boolean;
 };
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -26,6 +28,7 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined);
 export function ProductProvider({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const getInitialState = () => {
     const params: ProductState = {};
@@ -46,20 +49,22 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
   const updateOption = (name: string, value: string) => {
     const newState = { ...state, [name]: value };
-    setOptimisticState(newState);
-    const params = new URLSearchParams(searchParams?.toString());
-    params.set(name, value);
-    router.push(`?${params.toString()}`, { scroll: false });
-    return newState;
+    startTransition(() => {
+      setOptimisticState(newState);
+      const params = new URLSearchParams(searchParams?.toString());
+      params.set(name, value);
+      router.push(`?${params.toString()}`, { scroll: false });
+    });
   };
 
   const updateImage = (index: string) => {
     const newState = { ...state, image: index };
-    setOptimisticState(newState);
-    const params = new URLSearchParams(searchParams?.toString());
-    params.set("image", index);
-    router.push(`?${params.toString()}`, { scroll: false });
-    return newState;
+    startTransition(() => {
+      setOptimisticState(newState);
+      const params = new URLSearchParams(searchParams?.toString());
+      params.set("image", index);
+      router.push(`?${params.toString()}`, { scroll: false });
+    });
   };
 
   const value = useMemo(
@@ -67,8 +72,9 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       state,
       updateOption,
       updateImage,
+      isPending,
     }),
-    [state, searchParams]
+    [state, searchParams, isPending]
   );
 
   return (
@@ -86,12 +92,15 @@ export function useProduct() {
 
 export function useUpdateURL() {
   const router = useRouter();
+  const [, startTransition] = useTransition();
 
   return (state: ProductState) => {
-    const newParams = new URLSearchParams(window.location.search);
-    Object.entries(state).forEach(([key, value]) => {
-      newParams.set(key, value);
+    startTransition(() => {
+      const newParams = new URLSearchParams(window.location.search);
+      Object.entries(state).forEach(([key, value]) => {
+        newParams.set(key, value);
+      });
+      router.push(`?${newParams.toString()}`, { scroll: false });
     });
-    router.push(`?${newParams.toString()}`, { scroll: false });
   };
 }

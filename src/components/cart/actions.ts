@@ -8,14 +8,11 @@ import {
   removeFromCart,
   updateCart,
 } from "@/app/lib/shopify";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-export async function addItem(
-  prevState: any,
-  selectedVariantId: string | undefined
-) {
+export async function addItem(prevState: any, selectedVariantId: string) {
   let cartId = cookies().get("cartId")?.value;
 
   if (!cartId || !selectedVariantId) {
@@ -27,8 +24,10 @@ export async function addItem(
       { merchandiseId: selectedVariantId, quantity: 1 },
     ]);
     revalidateTag(TAGS.cart);
+    return null;
   } catch (error) {
-    throw new Error("Error adding item to cart");
+    console.error("Error adding item to cart:", error);
+    return "Error adding item to cart";
   }
 }
 

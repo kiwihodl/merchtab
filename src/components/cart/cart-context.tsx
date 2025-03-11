@@ -6,7 +6,8 @@ import {
   Product,
   ProductVariant,
 } from "@/app/lib/shopify/types";
-import { createContext, use, useContext, useMemo, useOptimistic } from "react";
+import { createContext, use, useContext, useMemo, useTransition } from "react";
+import { useOptimisticCart } from "@/hooks/useOptimisticCart";
 
 type UpdateType = "plus" | "minus" | "delete";
 
@@ -14,16 +15,9 @@ type CartContextType = {
   cart: Cart | undefined;
   updateCartItem: (merchandiseId: string, updateType: UpdateType) => void;
   addCartItem: (variant: ProductVariant, product: Product) => void;
+  pendingOperations: any[];
+  isPending: boolean;
 };
-type CartAction =
-  | {
-      type: "UPDATE_ITEM";
-      payload: { merchandiseId: string; updateType: UpdateType };
-    }
-  | {
-      type: "ADD_ITEM";
-      payload: { variant: ProductVariant; product: Product };
-    };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -127,66 +121,6 @@ function createOrUpdateCartItem(
   };
 }
 
-function cartReducer(state: Cart | undefined, action: CartAction): Cart {
-  const currentCart = state || createEmptyCart();
-
-  switch (action.type) {
-    case "UPDATE_ITEM": {
-      const { merchandiseId, updateType } = action.payload;
-      const updatedLines = currentCart.lines
-        .map((item) =>
-          item.merchandise.id === merchandiseId
-            ? updateCartItem(item, updateType)
-            : item
-        )
-        .filter(Boolean) as CartItem[];
-
-      if (updatedLines.length === 0) {
-        return {
-          ...currentCart,
-          lines: [],
-          totalQuantity: 0,
-          cost: {
-            ...currentCart.cost,
-            totalAmount: { ...currentCart.cost.totalAmount, amount: "0" },
-          },
-        };
-      }
-
-      return {
-        ...currentCart,
-        ...updateCartTotals(updatedLines),
-        lines: updatedLines,
-      };
-    }
-    case "ADD_ITEM": {
-      const { variant, product } = action.payload;
-      const existingItem = currentCart.lines.find(
-        (item) => item.merchandise.id === variant.id
-      );
-      const updatedItem = createOrUpdateCartItem(
-        existingItem,
-        variant,
-        product
-      );
-
-      const updatedLines = existingItem
-        ? currentCart.lines.map((item) =>
-            item.merchandise.id === variant.id ? updatedItem : item
-          )
-        : [...currentCart.lines, updatedItem];
-
-      return {
-        ...currentCart,
-        ...updateCartTotals(updatedLines),
-        lines: updatedLines,
-      };
-    }
-    default:
-      return currentCart;
-  }
-}
-
 export function CartProvider({
   children,
   cartPromise,
@@ -195,29 +129,42 @@ export function CartProvider({
   cartPromise: Promise<Cart | undefined>;
 }) {
   const initialCart = use(cartPromise);
-  const [optimisticCart, updateOptimisticCart] = useOptimistic(
-    initialCart,
-    cartReducer
-  );
+  const [isPending, startTransition] = useTransition();
+  const { cart, addToCart, updateQuantity, removeFromCart, pendingOperations } =
+    useOptimisticCart(initialCart);
 
   const updateCartItem = (merchandiseId: string, updateType: UpdateType) => {
-    updateOptimisticCart({
-      type: "UPDATE_ITEM",
-      payload: { merchandiseId, updateType },
+    startTransition(() => {
+      if (updateType === "delete") {
+        removeFromCart(merchandiseId);
+      } else {
+        const item = cart?.lines.find(
+          (line) => line.merchandise.id === merchandiseId
+        );
+        if (item) {
+          const newQuantity =
+            updateType === "plus" ? item.quantity + 1 : item.quantity - 1;
+          updateQuantity(merchandiseId, newQuantity);
+        }
+      }
     });
   };
 
   const addCartItem = (variant: ProductVariant, product: Product) => {
-    updateOptimisticCart({ type: "ADD_ITEM", payload: { variant, product } });
+    startTransition(() => {
+      addToCart(variant, product);
+    });
   };
 
   const value = useMemo(
     () => ({
-      cart: optimisticCart,
+      cart,
       updateCartItem,
       addCartItem,
+      pendingOperations,
+      isPending,
     }),
-    [optimisticCart]
+    [cart, pendingOperations, isPending]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
