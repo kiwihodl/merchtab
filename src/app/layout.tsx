@@ -10,8 +10,31 @@ import { getCart } from "@/app/lib/shopify";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MerchTab",
-  description: "A modern e-commerce frontend built with Next.js and Shopify",
+  title: "Sovereign University",
+  description: "Official merchandise store for Sovereign University",
+  metadataBase: new URL("https://sovereignuniversity.vercel.app"),
+  openGraph: {
+    title: "Sovereign University",
+    description: "Official merchandise store for Sovereign University",
+    url: "https://sovereignuniversity.vercel.app",
+    siteName: "Sovereign University",
+    images: [
+      {
+        url: "https://sovereignuniversity.vercel.app/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Sovereign University",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sovereign University",
+    description: "Official merchandise store for Sovereign University",
+    images: ["https://sovereignuniversity.vercel.app/opengraph-image"],
+  },
 };
 
 export default async function RootLayout({
