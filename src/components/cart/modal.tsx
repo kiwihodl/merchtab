@@ -84,11 +84,19 @@ export default function CartModal() {
               </div>
 
               {!cart || cart.lines.length === 0 ? (
-                <div>
-                  <ShoppingCartIcon className="h-16" />
-                  <p className="mt-6 text-center text-2xl font-bold">
-                    Your Cart is Empty.
-                  </p>
+                <div className="flex flex-col items-center justify-between h-full">
+                  <div className="flex flex-col items-center justify-center flex-grow mt-4">
+                    <ShoppingCartIcon className="h-16 text-neutral-500" />
+                    <p className="mt-6 text-center text-2xl font-bold">
+                      Your Cart is Empty.
+                    </p>
+                  </div>
+                  <button
+                    onClick={closeCart}
+                    className="w-full rounded-full border border-accent bg-black p-3 text-center text-sm font-medium text-accent opacity-90 hover:opacity-100 md:hidden"
+                  >
+                    Keep Shopping
+                  </button>
                 </div>
               ) : (
                 <div className="flex h-full flex-col justify-between overflow-hidden p-1">
@@ -120,7 +128,7 @@ export default function CartModal() {
                         return (
                           <li
                             key={i}
-                            className="flex w-full flex-col pb-4 mb-4 relative"
+                            className={`flex w-full flex-col pb-4 mb-4 relative ${i === 0 ? "mt-4" : ""}`}
                           >
                             <div className="absolute -left-3 -top-2.5 z-[9999]">
                               <DeleteItemButton
@@ -195,31 +203,39 @@ export default function CartModal() {
                         );
                       })}
                   </ul>
-                  <div className="py-4 text-sm text-black dark:text-white">
-                    <div className="mb-3 flex items-center justify-between border-b-[0.5px] border-accent pb-1">
-                      <p>Taxes</p>
-                      <Price
-                        className="text-right text-base text-black dark:text-white"
-                        amount={cart.cost.totalTaxAmount.amount}
-                        currencyCode={cart.cost.totalTaxAmount.currencyCode}
-                      />
+                  <div className="flex flex-col gap-3">
+                    <div className="py-4 text-sm text-black dark:text-white">
+                      <div className="mb-3 flex items-center justify-between border-b-[0.5px] border-accent pb-1">
+                        <p>Taxes</p>
+                        <Price
+                          className="text-right text-base text-black dark:text-white"
+                          amount={cart.cost.totalTaxAmount.amount}
+                          currencyCode={cart.cost.totalTaxAmount.currencyCode}
+                        />
+                      </div>
+                      <div className="mb-3 flex items-center justify-between border-b-[0.5px] border-accent pb-1 pt-1">
+                        <p>Shipping</p>
+                        <p className="text-right">Calculated at checkout</p>
+                      </div>
+                      <div className="mb-3 flex items-center justify-between border-b-[0.5px] border-accent pb-1 pt-1">
+                        <p>Total</p>
+                        <Price
+                          className="text-right text-base text-black dark:text-white"
+                          amount={cart.cost.totalAmount.amount}
+                          currencyCode={cart.cost.totalAmount.currencyCode}
+                        />
+                      </div>
                     </div>
-                    <div className="mb-3 flex items-center justify-between border-b-[0.5px] border-accent pb-1 pt-1">
-                      <p>Shipping</p>
-                      <p className="text-right">Calculated at checkout</p>
-                    </div>
-                    <div className="mb-3 flex items-center justify-between border-b-[0.5px] border-accent pb-1 pt-1">
-                      <p>Total</p>
-                      <Price
-                        className="text-right text-base text-black dark:text-white"
-                        amount={cart.cost.totalAmount.amount}
-                        currencyCode={cart.cost.totalAmount.currencyCode}
-                      />
-                    </div>
+                    <button
+                      onClick={closeCart}
+                      className="w-full rounded-full border border-accent bg-black p-3 text-center text-sm font-medium text-accent opacity-90 hover:opacity-100 md:hidden"
+                    >
+                      Keep Shopping
+                    </button>
+                    <form action={redirectToCheckout}>
+                      <CheckoutButton />
+                    </form>
                   </div>
-                  <form action={redirectToCheckout}>
-                    <CheckoutButton />
-                  </form>
                 </div>
               )}
             </Dialog.Panel>
