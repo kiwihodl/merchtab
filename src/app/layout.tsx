@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     siteName: "Sovereign University",
     images: [
       {
-        url: "https://sovereignuniversity.vercel.app/opengraph-image",
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Sovereign University",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Sovereign University",
     description: "Official merchandise store for Sovereign University",
-    images: ["https://sovereignuniversity.vercel.app/opengraph-image"],
+    images: ["/og-image.png"],
   },
 };
 
