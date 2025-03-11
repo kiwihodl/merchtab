@@ -10,7 +10,7 @@ export default async function OpengraphImage(
 ): Promise<ImageResponse> {
   const { title } = {
     ...{
-      title: process.env.NEXT_PUBLIC_SITE_NAME,
+      title: "Brand Logo",
     },
     ...props,
   };
