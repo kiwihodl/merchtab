@@ -1,32 +1,29 @@
 "use client";
 
-import { CartItem } from "@/app/lib/shopify/types";
 import clsx from "clsx";
-import { useFormStatus } from "react-dom";
-import { updateItemQuantity } from "./actions";
-import { useFormState } from "react-dom";
+import { useCart } from "./cart-context";
 
 function SubmitButton({
   type,
+  onClick,
   disabled,
 }: {
   type: "plus" | "minus";
+  onClick: () => void;
   disabled?: boolean;
 }) {
-  const { pending } = useFormStatus();
-  const isDisabled = pending || disabled;
-
   return (
     <button
-      type="submit"
+      onClick={onClick}
       className={clsx(
-        "ease flex h-full min-w-[32px] max-w-[32px] flex-none items-center justify-center px-2",
+        "ease flex h-full min-w-[32px] max-w-[32px] flex-none items-center justify-center",
         {
-          "cursor-not-allowed opacity-50": isDisabled,
-          "hover:opacity-50": !isDisabled,
+          "cursor-not-allowed opacity-50": disabled,
+          "hover:opacity-50": !disabled,
         }
       )}
-      disabled={isDisabled}
+      disabled={disabled}
+      aria-label={type === "minus" ? "Decrease quantity" : "Increase quantity"}
     >
       {type === "minus" ? (
         <svg
@@ -58,34 +55,31 @@ function SubmitButton({
 }
 
 export function EditItemQuantityButton({
-  item,
-  type,
-  optimisticUpdate,
+  merchandiseId,
+  quantity,
   disabled,
 }: {
-  item: CartItem;
-  type: "plus" | "minus";
-  optimisticUpdate: any;
+  merchandiseId: string;
+  quantity: number;
   disabled?: boolean;
 }) {
-  const [message, formAction] = useFormState(updateItemQuantity, null);
-  const payload = {
-    merchandiseId: item.merchandise.id,
-    quantity: type === "plus" ? item.quantity + 1 : item.quantity - 1,
-  };
-  const actionWithVariant = formAction.bind(null, payload);
+  const { updateCartItem } = useCart();
 
   return (
-    <form
-      action={async () => {
-        optimisticUpdate(payload.merchandiseId, type);
-        await actionWithVariant();
-      }}
-    >
-      <SubmitButton type={type} disabled={disabled} />
-      <p aria-label="polite" className="sr-only" role="status">
-        {message ?? ""}
+    <div className="flex items-center">
+      <SubmitButton
+        type="minus"
+        onClick={() => updateCartItem(merchandiseId, "minus")}
+        disabled={disabled || quantity <= 1}
+      />
+      <p className="w-6 text-center">
+        <span className="w-full text-sm">{quantity}</span>
       </p>
-    </form>
+      <SubmitButton
+        type="plus"
+        onClick={() => updateCartItem(merchandiseId, "plus")}
+        disabled={disabled}
+      />
+    </div>
   );
 }

@@ -8,6 +8,7 @@ import clsx from "clsx";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { addItem } from "./actions";
 import { useTransition } from "react";
+import { Button } from "@/components/ui/button";
 
 function SubmitButton({
   availableForSale,
@@ -21,7 +22,7 @@ function SubmitButton({
   isPending: boolean;
 }) {
   const buttonClasses =
-    "relative flex w-full items-center justify-center rounded-full bg-accent p-4 tracking-wide text-black transition duration-theme-default hover:bg-accent/90";
+    "relative flex items-center justify-center rounded-full bg-accent px-4 py-2 tracking-wide text-black transition duration-theme-default hover:bg-accent/90";
   const disabledClasses =
     "cursor-not-allowed opacity-60 hover:opacity-60 bg-neutral-600 hover:bg-neutral-600";
 
@@ -62,7 +63,7 @@ function SubmitButton({
 
 export function AddToCart({ product }: { product: Product }) {
   const { variants, availableForSale } = product;
-  const { addCartItem, pendingOperations, isPending } = useCart();
+  const { addCartItem, isOperationPending } = useCart();
   const { state } = useProduct();
   const [isSubmitting, startTransition] = useTransition();
 
@@ -75,10 +76,6 @@ export function AddToCart({ product }: { product: Product }) {
   const selectedVariantId = variant?.id || defaultVariantId;
   const finalVariant = variants.find(
     (variant) => variant.id === selectedVariantId
-  );
-
-  const isLoading = pendingOperations.some(
-    (op) => op.type === "ADD" && op.payload.variant?.id === selectedVariantId
   );
 
   if (!finalVariant || !selectedVariantId) {
@@ -97,12 +94,12 @@ export function AddToCart({ product }: { product: Product }) {
   };
 
   return (
-    <form action={handleSubmit}>
+    <form action={handleSubmit} method="POST">
       <SubmitButton
         availableForSale={availableForSale}
         selectedVariantId={selectedVariantId}
-        isLoading={isLoading}
-        isPending={isPending || isSubmitting}
+        isLoading={isOperationPending(selectedVariantId)}
+        isPending={isSubmitting}
       />
     </form>
   );

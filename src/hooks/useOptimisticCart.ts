@@ -87,37 +87,71 @@ export function useOptimisticCart(initialCart: Cart | undefined) {
     }
   );
 
-  const [pendingOperations, setPendingOperations] = useOptimistic<Operation[]>(
-    [],
-    (state, operation: Operation) => [...state, operation]
+  const [pendingOperations, setPendingOperations] = useState<Operation[]>([]);
+
+  const isOperationPending = useCallback(
+    (merchandiseId?: string) => {
+      if (!merchandiseId) return pendingOperations.length > 0;
+      return pendingOperations.some(
+        (op) => op.payload.merchandiseId === merchandiseId
+      );
+    },
+    [pendingOperations]
   );
 
-  const addToCart = (variant: ProductVariant, product: Product) => {
+  const addToCart = useCallback((variant: ProductVariant, product: Product) => {
     const operation: Operation = {
       type: "ADD",
       payload: { variant, product },
     };
     addOptimisticOperation(operation);
-    setPendingOperations(operation);
-  };
+    setPendingOperations((prev) => [...prev, operation]);
 
-  const updateQuantity = (merchandiseId: string, quantity: number) => {
-    const operation: Operation = {
-      type: "UPDATE",
-      payload: { merchandiseId, quantity },
-    };
-    addOptimisticOperation(operation);
-    setPendingOperations(operation);
-  };
+    addItem(variant.id)
+      .then(() => {
+        setPendingOperations((prev) => prev.filter((op) => op !== operation));
+      })
+      .catch(() => {
+        setPendingOperations((prev) => prev.filter((op) => op !== operation));
+      });
+  }, []);
 
-  const removeFromCart = (merchandiseId: string) => {
+  const updateQuantity = useCallback(
+    (merchandiseId: string, quantity: number) => {
+      const operation: Operation = {
+        type: "UPDATE",
+        payload: { merchandiseId, quantity },
+      };
+      addOptimisticOperation(operation);
+      setPendingOperations((prev) => [...prev, operation]);
+
+      updateItemQuantity(merchandiseId, quantity)
+        .then(() => {
+          setPendingOperations((prev) => prev.filter((op) => op !== operation));
+        })
+        .catch(() => {
+          setPendingOperations((prev) => prev.filter((op) => op !== operation));
+        });
+    },
+    []
+  );
+
+  const removeFromCart = useCallback((merchandiseId: string) => {
     const operation: Operation = {
       type: "REMOVE",
       payload: { merchandiseId },
     };
     addOptimisticOperation(operation);
-    setPendingOperations(operation);
-  };
+    setPendingOperations((prev) => [...prev, operation]);
+
+    removeItem(null, merchandiseId)
+      .then(() => {
+        setPendingOperations((prev) => prev.filter((op) => op !== operation));
+      })
+      .catch(() => {
+        setPendingOperations((prev) => prev.filter((op) => op !== operation));
+      });
+  }, []);
 
   return {
     cart,
@@ -125,6 +159,7 @@ export function useOptimisticCart(initialCart: Cart | undefined) {
     updateQuantity,
     removeFromCart,
     pendingOperations,
+    isOperationPending,
   };
 }
 

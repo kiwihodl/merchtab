@@ -4,6 +4,20 @@
 
 This PDR details the implementation of optimistic updates for cart operations to provide instant feedback while ensuring data consistency.
 
+## ⚠️ Critical Implementation Requirements
+
+1. **Navbar MUST Remain a Server Component**
+
+   - The Navbar component MUST stay as a server component
+   - DO NOT convert Navbar to a client component
+   - DO NOT create new client components to replace Navbar functionality
+
+2. **Maintain Existing Styling**
+   - All existing component styling MUST be preserved
+   - Modify existing components instead of creating new ones
+   - Keep all current CSS classes and design patterns
+   - DO NOT introduce new styling patterns unless explicitly required
+
 ## Current Implementation Status
 
 ✅ Completed:
@@ -83,6 +97,20 @@ This PDR details the implementation of optimistic updates for cart operations to
 - Usage examples pending
 
 ## Technical Implementation
+
+### Implementation Guidelines
+
+1. Component Modifications:
+
+   - Always modify existing components rather than creating new ones
+   - Preserve all existing styling and class names
+   - Add new functionality within existing component structure
+   - Keep current UI/UX patterns intact
+
+2. Server Components:
+   - Navbar must remain a server component
+   - Use client components only where absolutely necessary for interactivity
+   - Keep existing component architecture
 
 ### State Management
 

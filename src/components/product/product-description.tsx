@@ -28,7 +28,9 @@ export function ProductDescription({
               showCurrency={false}
             />
           </div>
-          <AddToCart product={product} />
+          <div className="w-auto lg:hidden">
+            <AddToCart product={product} />
+          </div>
         </div>
       </div>
       <div className="flex flex-col items-center lg:items-start">
@@ -36,6 +38,9 @@ export function ProductDescription({
           options={product.options}
           variants={product.variants}
         />
+        <div className="hidden w-full mt-4 lg:block">
+          <AddToCart product={product} />
+        </div>
         {product.descriptionHtml ? (
           <Prose
             className="mb-6 text-sm leading-light text-white dark:text-white"

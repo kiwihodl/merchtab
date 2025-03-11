@@ -205,20 +205,8 @@ export default function CartModal() {
                             </div>
                             <div className="flex h-9 flex-row items-center rounded-full border border-accent">
                               <EditItemQuantityButton
-                                item={item}
-                                type="minus"
-                                optimisticUpdate={updateCartItem}
-                                disabled={isLoading}
-                              />
-                              <p className="w-6 text-center">
-                                <span className="w-full text-sm text-black dark:text-white">
-                                  {item.quantity}
-                                </span>
-                              </p>
-                              <EditItemQuantityButton
-                                item={item}
-                                type="plus"
-                                optimisticUpdate={updateCartItem}
+                                merchandiseId={item.merchandise.id}
+                                quantity={item.quantity}
                                 disabled={isLoading}
                               />
                             </div>

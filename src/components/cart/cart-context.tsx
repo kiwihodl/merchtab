@@ -17,6 +17,7 @@ type CartContextType = {
   addCartItem: (variant: ProductVariant, product: Product) => void;
   pendingOperations: any[];
   isPending: boolean;
+  isOperationPending: (merchandiseId?: string) => boolean;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -130,8 +131,14 @@ export function CartProvider({
 }) {
   const initialCart = use(cartPromise);
   const [isPending, startTransition] = useTransition();
-  const { cart, addToCart, updateQuantity, removeFromCart, pendingOperations } =
-    useOptimisticCart(initialCart);
+  const {
+    cart,
+    addToCart,
+    updateQuantity,
+    removeFromCart,
+    pendingOperations,
+    isOperationPending,
+  } = useOptimisticCart(initialCart);
 
   const updateCartItem = (merchandiseId: string, updateType: UpdateType) => {
     startTransition(() => {
@@ -144,7 +151,11 @@ export function CartProvider({
         if (item) {
           const newQuantity =
             updateType === "plus" ? item.quantity + 1 : item.quantity - 1;
-          updateQuantity(merchandiseId, newQuantity);
+          if (newQuantity === 0) {
+            removeFromCart(merchandiseId);
+          } else {
+            updateQuantity(merchandiseId, newQuantity);
+          }
         }
       }
     });
@@ -163,8 +174,9 @@ export function CartProvider({
       addCartItem,
       pendingOperations,
       isPending,
+      isOperationPending,
     }),
-    [cart, pendingOperations, isPending]
+    [cart, pendingOperations, isPending, isOperationPending]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
