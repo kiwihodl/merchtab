@@ -35,9 +35,6 @@ export async function generateMetadata({
   const imageAlt =
     featuredImage?.altText || firstImage?.altText || product.title;
 
-  // Force 1200x630 canvas with scaled product image centered
-  const socialImageUrl = `${imageUrl}?width=630&height=630&canvas=1200x630&format=jpg&background=ffffff`;
-
   return {
     title: product.seo.title || product.title,
     description: product.seo.description || product.description,
@@ -56,7 +53,7 @@ export async function generateMetadata({
       url: `https://sovereignuniversity.vercel.app/product/${params.handle}`,
       images: [
         {
-          url: socialImageUrl,
+          url: imageUrl,
           width: 1200,
           height: 630,
           alt: imageAlt,
@@ -70,7 +67,7 @@ export async function generateMetadata({
       creator: "@SovereignUni",
       title: product.seo.title || product.title,
       description: product.seo.description || product.description,
-      images: [socialImageUrl],
+      images: [imageUrl],
     },
   };
 }
