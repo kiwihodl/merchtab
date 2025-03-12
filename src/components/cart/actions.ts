@@ -159,3 +159,10 @@ export async function createCartAndSetCookie() {
   let cart = await createCart();
   cookies().set("cartId", cart.id!);
 }
+
+export async function revalidateProducts() {
+  "use server";
+  revalidateTag(TAGS.products);
+  revalidateTag(TAGS.collections);
+  return null;
+}

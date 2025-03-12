@@ -23,6 +23,13 @@ export async function generateMetadata({
   const { url, width, height, altText: alt } = product.featuredImage || {};
   const indexable = !product.tags.includes(HIDDEN_PRODUCT_TAG);
 
+  // Get the first available image if featured image is not set
+  const firstImage = product.images[0];
+  const imageUrl = url || firstImage?.url;
+  const imageWidth = width || firstImage?.width;
+  const imageHeight = height || firstImage?.height;
+  const imageAlt = alt || firstImage?.altText || product.title;
+
   return {
     title: product.seo.title || product.title,
     description: product.seo.description || product.description,
@@ -34,18 +41,31 @@ export async function generateMetadata({
         follow: indexable,
       },
     },
-    openGraph: url
-      ? {
-          images: [
+    openGraph: {
+      title: product.seo.title || product.title,
+      description: product.seo.description || product.description,
+      type: "website",
+      url: `https://sovereignuniversity.vercel.app/product/${params.handle}`,
+      images: imageUrl
+        ? [
             {
-              url,
-              width,
-              height,
-              alt,
+              url: imageUrl,
+              width: imageWidth,
+              height: imageHeight,
+              alt: imageAlt,
             },
-          ],
-        }
-      : null,
+          ]
+        : [],
+      siteName: "Sovereign University",
+    },
+    twitter: {
+      card: "summary_large_image",
+      site: "@SovereignUni",
+      creator: "@SovereignUni",
+      title: product.seo.title || product.title,
+      description: product.seo.description || product.description,
+      images: imageUrl ? [imageUrl] : [],
+    },
   };
 }
 

@@ -10,6 +10,8 @@ export const metadata = {
   description: "Browse our collection of products.",
 };
 
+export const runtime = "edge";
+
 export default async function HomePage({
   searchParams,
 }: {
@@ -19,6 +21,7 @@ export default async function HomePage({
   const { sortKey, reverse } =
     sorting.find((item) => item.slug === sort) || defaultSort;
   const products = await getProducts({ sortKey, reverse, query: searchValue });
+  console.log("Home page products:", products);
 
   return (
     <div className="mx-auto flex max-w-screen-2xl flex-col gap-8 px-4 pb-4 text-black md:flex-row dark:text-white">
