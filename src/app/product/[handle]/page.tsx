@@ -20,30 +20,11 @@ export async function generateMetadata({
 
   if (!product) return notFound();
 
-  // Get the first available image if featured image is not set
   const firstImage = product.images[0];
   const featuredImage = product.featuredImage;
-
-  // Server-side logging
-  console.log("[Server] Product images for:", params.handle);
-  console.log(
-    JSON.stringify(
-      {
-        featuredImageUrl: featuredImage?.url,
-        firstImageUrl: firstImage?.url,
-        totalImages: product.images.length,
-        allImageUrls: product.images.map((img) => img.url),
-      },
-      null,
-      2
-    )
-  );
-
-  // Ensure we have a valid image URL
   const imageUrl = featuredImage?.url || firstImage?.url;
 
   if (!imageUrl) {
-    console.error("[Server] No product image found for:", params.handle);
     return {
       title: product.seo.title || product.title,
       description: product.seo.description || product.description,
@@ -54,22 +35,8 @@ export async function generateMetadata({
   const imageAlt =
     featuredImage?.altText || firstImage?.altText || product.title;
 
-  // Construct the social media optimized image URL
-  const socialImageUrl = `${imageUrl}?width=1200&height=630&crop=top`;
-
-  console.log(
-    "[Server] Social image metadata:",
-    JSON.stringify(
-      {
-        handle: params.handle,
-        originalUrl: imageUrl,
-        socialImageUrl,
-        imageAlt,
-      },
-      null,
-      2
-    )
-  );
+  // Show full product image with black padding to maintain aspect ratio
+  const socialImageUrl = `${imageUrl}&width=1200&height=630&fit=contain&background=000000`;
 
   return {
     title: product.seo.title || product.title,
@@ -110,33 +77,14 @@ export async function generateMetadata({
 
 export default async function ProductPage({
   params,
-  searchParams,
 }: {
   params: { handle: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   const product = await getProduct(params.handle);
   if (!product) return notFound();
 
-  // Add debug info
-  const debugInfo = {
-    featuredImage: product.featuredImage?.url,
-    firstImage: product.images[0]?.url,
-    totalImages: product.images.length,
-    allImageUrls: product.images.map((img) => img.url),
-    openGraphImage: `${product.featuredImage?.url || product.images[0]?.url}?width=1200&height=630&crop=top`,
-  };
-
-  const showDebug = searchParams?.debug === "true";
-
   return (
     <ProductProvider>
-      {showDebug && (
-        <div className="fixed top-0 right-0 bg-black/80 text-white p-4 m-4 rounded-lg max-w-lg z-50 overflow-auto">
-          <h3 className="font-bold mb-2">Debug Info:</h3>
-          <pre className="text-xs">{JSON.stringify(debugInfo, null, 2)}</pre>
-        </div>
-      )}
       <div className="mx-auto max-w-screen-2xl px-4">
         <div className="flex flex-col rounded-2xl bg-black p-8 md:p-12 relative">
           <Link
