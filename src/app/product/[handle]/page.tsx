@@ -20,15 +20,56 @@ export async function generateMetadata({
 
   if (!product) return notFound();
 
-  const { url, width, height, altText: alt } = product.featuredImage || {};
-  const indexable = !product.tags.includes(HIDDEN_PRODUCT_TAG);
-
   // Get the first available image if featured image is not set
   const firstImage = product.images[0];
-  const imageUrl = url || firstImage?.url;
-  const imageWidth = 1200; // Force standard social media width
-  const imageHeight = 630; // Force standard social media height
-  const imageAlt = alt || firstImage?.altText || product.title;
+  const featuredImage = product.featuredImage;
+
+  // Server-side logging
+  console.log("[Server] Product images for:", params.handle);
+  console.log(
+    JSON.stringify(
+      {
+        featuredImageUrl: featuredImage?.url,
+        firstImageUrl: firstImage?.url,
+        totalImages: product.images.length,
+        allImageUrls: product.images.map((img) => img.url),
+      },
+      null,
+      2
+    )
+  );
+
+  // Ensure we have a valid image URL
+  const imageUrl = featuredImage?.url || firstImage?.url;
+
+  if (!imageUrl) {
+    console.error("[Server] No product image found for:", params.handle);
+    return {
+      title: product.seo.title || product.title,
+      description: product.seo.description || product.description,
+    };
+  }
+
+  const indexable = !product.tags.includes(HIDDEN_PRODUCT_TAG);
+  const imageAlt =
+    featuredImage?.altText || firstImage?.altText || product.title;
+
+  // Construct the social media optimized image URL
+  const socialImageUrl = `${imageUrl}?width=1200&height=630&crop=top`;
+
+  console.log(
+    "[Server] Social image metadata:",
+    JSON.stringify(
+      {
+        handle: params.handle,
+        originalUrl: imageUrl,
+        socialImageUrl,
+        imageAlt,
+      },
+      null,
+      2
+    )
+  );
 
   return {
     title: product.seo.title || product.title,
@@ -46,19 +87,14 @@ export async function generateMetadata({
       description: product.seo.description || product.description,
       type: "website",
       url: `https://sovereignuniversity.vercel.app/product/${params.handle}`,
-      images: imageUrl
-        ? [
-            {
-              url: imageUrl,
-              width: imageWidth,
-              height: imageHeight,
-              alt: imageAlt,
-              // Add Shopify image transformation parameters to show the full product
-              // ?width=1200&height=630&crop=top ensures we get the top portion of the image
-              secureUrl: `${imageUrl}?width=1200&height=630&crop=top`,
-            },
-          ]
-        : [],
+      images: [
+        {
+          url: socialImageUrl,
+          width: 1200,
+          height: 630,
+          alt: imageAlt,
+        },
+      ],
       siteName: "Sovereign University",
     },
     twitter: {
@@ -67,8 +103,7 @@ export async function generateMetadata({
       creator: "@SovereignUni",
       title: product.seo.title || product.title,
       description: product.seo.description || product.description,
-      // Add the same image transformation for Twitter
-      images: imageUrl ? [`${imageUrl}?width=1200&height=630&crop=top`] : [],
+      images: [socialImageUrl],
     },
   };
 }
