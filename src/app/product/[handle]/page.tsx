@@ -110,13 +110,24 @@ export async function generateMetadata({
 
 export default async function ProductPage({
   params,
+  searchParams,
 }: {
   params: { handle: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   const product = await getProduct(params.handle);
   if (!product) return notFound();
+
+  const showDebug = searchParams?.debug === "true";
+
   return (
     <ProductProvider>
+      {showDebug && (
+        <div className="fixed top-0 right-0 bg-black/80 text-white p-4 m-4 rounded-lg max-w-lg z-50 overflow-auto">
+          <h3 className="font-bold mb-2">Debug Info:</h3>
+          <pre className="text-xs">{JSON.stringify(debugInfo, null, 2)}</pre>
+        </div>
+      )}
       <div className="mx-auto max-w-screen-2xl px-4">
         <div className="flex flex-col rounded-2xl bg-black p-8 md:p-12 relative">
           <Link
