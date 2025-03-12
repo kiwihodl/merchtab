@@ -35,8 +35,8 @@ export async function generateMetadata({
   const imageAlt =
     featuredImage?.altText || firstImage?.altText || product.title;
 
-  // Use Shopify's CDN parameters
-  const socialImageUrl = `${imageUrl}?width=1200&height=630&format=jpg&fit=bounds`;
+  // Scale product image to 630px height and center it on 1200x630 white canvas
+  const socialImageUrl = `${imageUrl}?width=630&height=630&background=ffffff&format=jpg`;
 
   return {
     title: product.seo.title || product.title,
