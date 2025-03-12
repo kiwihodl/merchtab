@@ -4,6 +4,46 @@
 
 This PDR details the implementation of optimistic updates for cart operations to provide instant feedback while ensuring data consistency.
 
+## Development and Deployment Workflow
+
+1. **PDR Creation and Review**
+
+   - Create detailed PDR with requirements and implementation plan
+   - Review PDR with team for completeness
+   - Get PDR approval before proceeding
+
+2. **Implementation Phase**
+
+   - Create/update necessary components and hooks
+   - Implement core functionality
+   - Add error handling and UI feedback
+   - Ensure code follows project standards
+
+3. **Testing Phase**
+
+   - Write comprehensive tests (`npm test`)
+   - Fix failing tests until all pass
+   - Ensure test coverage meets requirements
+
+4. **Build Verification**
+
+   - Run production build (`npm run build`)
+   - Address any build warnings/errors
+   - Verify build output
+
+5. **Development Testing**
+
+   - Start development server (`npm run dev`)
+   - Perform manual QA testing
+   - Wait for QA approval
+   - Fix any issues found during QA
+
+6. **Deployment**
+   - Commit changes with descriptive message
+   - Push to GitHub
+   - Monitor deployment pipeline
+   - Verify production deployment
+
 ## ⚠️ Critical Implementation Requirements
 
 1. **Navbar MUST Remain a Server Component**
@@ -168,10 +208,33 @@ type CartOperation = {
 
 Current Progress: ~40%
 
-- Days 1-2: Enhanced State Management ✅
-- Day 3: Error Handling 🚧
-- Day 4: Loading States ✅
-- Day 5-6: Cart Calculations and Testing ⏳
+1. PDR Creation and Review (Day 1)
+
+   - Create detailed PDR ✅
+   - Review and approval ✅
+
+2. Implementation (Days 2-3)
+
+   - Core functionality 🚧
+   - Error handling 🚧
+   - UI feedback 🚧
+
+3. Testing (Day 4)
+
+   - Write tests ⏳
+   - Fix failing tests ⏳
+   - Verify coverage ⏳
+
+4. Build and QA (Day 5)
+
+   - Production build ⏳
+   - Development testing ⏳
+   - QA verification ⏳
+
+5. Deployment (Day 6)
+   - Push to GitHub ⏳
+   - Monitor deployment ⏳
+   - Production verification ⏳
 
 ## Technical Requirements
 
@@ -232,32 +295,16 @@ type CartOperation = {
    - State optimization
    - Render optimization
 
-## Timeline
-
-Total: 6 days
-
-1. Enhanced State Management: Days 1-2
-2. Error Handling: Day 3
-3. Loading States: Day 4
-4. Cart Calculations: Day 5
-5. Testing and Documentation: Day 6
-
-## Success Metrics
-
-- 100% success rate for optimistic updates
-- < 100ms perceived latency
-- Zero data inconsistencies
-- 100% test coverage
-- Improved user satisfaction
-
 ## Implementation Path
 
-1. Create new hooks and utilities
-2. Implement core optimistic logic
-3. Add error handling
-4. Enhance UI feedback
-5. Add testing and documentation
-6. Deploy and monitor
+1. Create/update PDR with complete workflow
+2. Implement core functionality
+3. Write comprehensive tests
+4. Run and fix tests until passing
+5. Verify production build
+6. Test in development mode
+7. Get QA approval
+8. Deploy to production
 
 ## Future Considerations
 
