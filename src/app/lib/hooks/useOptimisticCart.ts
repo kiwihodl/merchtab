@@ -1,4 +1,7 @@
+"use client";
+
 import { useState, useCallback } from "react";
+import { useToast } from "./useToast";
 
 interface CartItem {
   id: string;
@@ -8,30 +11,16 @@ interface CartItem {
 
 interface Cart {
   items: CartItem[];
-  total: number;
   version: number;
-}
-
-interface CartOperation {
-  type: "ADD" | "REMOVE" | "UPDATE";
-  item: CartItem;
-  timestamp: number;
-  status: "PENDING" | "SUCCESS" | "FAILED";
 }
 
 interface ServerActions {
   addToCart: (item: CartItem) => Promise<{ success: boolean }>;
-  removeFromCart: (itemId: string) => Promise<{ success: boolean }>;
   updateQuantity: (
-    itemId: string,
+    id: string,
     quantity: number
   ) => Promise<{ success: boolean }>;
-}
-
-interface CartError {
-  message: string;
-  operation: CartOperation;
-  timestamp: number;
+  removeItem: (id: string) => Promise<{ success: boolean }>;
 }
 
 export function useOptimisticCart(
@@ -39,284 +28,160 @@ export function useOptimisticCart(
   serverActions: ServerActions
 ) {
   const [cart, setCart] = useState<Cart>(initialCart);
-  const [pendingOperations, setPendingOperations] = useState<CartOperation[]>(
-    []
-  );
-  const [errors, setErrors] = useState<CartError[]>([]);
   const [loadingCounter, setLoadingCounter] = useState(0);
+  const { addToast } = useToast();
+
   const isLoading = loadingCounter > 0;
 
-  // Helper to calculate cart total
-  const calculateTotal = useCallback((items: CartItem[]) => {
-    return items.reduce((total, item) => total + item.price * item.quantity, 0);
+  const incrementLoading = useCallback(() => {
+    setLoadingCounter((count) => count + 1);
   }, []);
 
-  // Helper to update cart state
-  const updateCartState = useCallback(
-    (items: CartItem[]) => {
-      setCart((prev) => ({
-        ...prev,
-        items,
-        total: calculateTotal(items),
-        version: prev.version + 1,
-      }));
-    },
-    [calculateTotal]
-  );
+  const decrementLoading = useCallback(() => {
+    setLoadingCounter((count) => Math.max(0, count - 1));
+  }, []);
 
-  // Add item to cart
   const addItem = useCallback(
-    async (item: CartItem, options = { retry: false }) => {
-      const operation: CartOperation = {
-        type: "ADD",
-        item,
-        timestamp: Date.now(),
-        status: "PENDING",
-      };
+    async (item: CartItem) => {
+      incrementLoading();
 
-      setPendingOperations((prev) => [...prev, operation]);
-      setLoadingCounter((c) => c + 1);
-
-      const initialVersion = cart.version;
+      // Optimistic update
+      setCart((currentCart) => ({
+        items: [...currentCart.items, item],
+        version: currentCart.version + 1,
+      }));
 
       try {
-        // Optimistically update the cart
-        setCart((prevCart) => {
-          const updatedItems = [...prevCart.items, item];
-          return {
-            ...prevCart,
-            items: updatedItems,
-            total: calculateTotal(updatedItems),
-            version: prevCart.version + 1,
-          };
-        });
+        const result = await serverActions.addToCart(item);
 
-        // Attempt server update
-        const maxRetries = options.retry ? 3 : 1;
-        let attempt = 0;
-
-        while (attempt < maxRetries) {
-          try {
-            const result = await serverActions.addToCart(item);
-            if (!result?.success) {
-              throw new Error("Server update failed");
-            }
-            break;
-          } catch (e) {
-            attempt++;
-            if (attempt === maxRetries) throw e;
-            await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
-          }
+        if (result.success) {
+          addToast({
+            type: "success",
+            message: "Item added to cart",
+            duration: 3000,
+          });
+        } else {
+          throw new Error("Failed to add item");
         }
-
-        // Update operation status
-        setPendingOperations((prev) =>
-          prev.map((op) =>
-            op.timestamp === operation.timestamp
-              ? { ...op, status: "SUCCESS" }
-              : op
-          )
-        );
-
-        return { success: true };
       } catch (error) {
-        // Rollback optimistic update
-        setCart({
-          items: cart.items.filter((i) => i.id !== item.id),
-          total: calculateTotal(cart.items.filter((i) => i.id !== item.id)),
-          version: initialVersion,
-        });
+        // Rollback on failure
+        setCart((currentCart) => ({
+          items: currentCart.items.filter((i) => i.id !== item.id),
+          version: currentCart.version + 1,
+        }));
 
-        // Record error
-        setErrors((prev) => [
-          ...prev,
-          {
-            message: error instanceof Error ? error.message : "Unknown error",
-            operation,
-            timestamp: Date.now(),
+        addToast({
+          type: "error",
+          message: "Failed to add item to cart",
+          action: {
+            label: "Retry",
+            onClick: () => addItem(item),
           },
-        ]);
-
-        setPendingOperations((prev) =>
-          prev.map((op) =>
-            op.timestamp === operation.timestamp
-              ? { ...op, status: "FAILED" }
-              : op
-          )
-        );
-
-        throw error;
+        });
       } finally {
-        setLoadingCounter((c) => c - 1);
+        decrementLoading();
       }
     },
-    [cart, calculateTotal, serverActions]
+    [serverActions, addToast, incrementLoading, decrementLoading]
   );
 
-  // Update item quantity
   const updateQuantity = useCallback(
-    async (itemId: string, newQuantity: number) => {
-      const item = cart.items.find((i) => i.id === itemId);
-      if (!item) return;
+    async (id: string, quantity: number) => {
+      incrementLoading();
 
-      const operation: CartOperation = {
-        type: "UPDATE",
-        item: { ...item, quantity: newQuantity },
-        timestamp: Date.now(),
-        status: "PENDING",
-      };
+      const previousItems = cart.items;
 
-      setPendingOperations((prev) => [...prev, operation]);
-      setLoadingCounter((c) => c + 1);
-
-      const initialVersion = cart.version;
-      const initialItems = [...cart.items];
+      // Optimistic update
+      setCart((currentCart) => ({
+        items: currentCart.items.map((item) =>
+          item.id === id ? { ...item, quantity } : item
+        ),
+        version: currentCart.version + 1,
+      }));
 
       try {
-        // Optimistically update the cart
-        setCart((prevCart) => {
-          const updatedItems = prevCart.items.map((i) =>
-            i.id === itemId ? { ...i, quantity: newQuantity } : i
-          );
-          return {
-            ...prevCart,
-            items: updatedItems,
-            total: calculateTotal(updatedItems),
-            version: prevCart.version + 1,
-          };
-        });
+        const result = await serverActions.updateQuantity(id, quantity);
 
-        // Server update
-        const result = await serverActions.updateQuantity(itemId, newQuantity);
-        if (!result?.success) {
-          throw new Error("Server update failed");
+        if (result.success) {
+          addToast({
+            type: "success",
+            message: "Cart updated",
+            duration: 3000,
+          });
+        } else {
+          throw new Error("Failed to update quantity");
         }
-
-        setPendingOperations((prev) =>
-          prev.map((op) =>
-            op.timestamp === operation.timestamp
-              ? { ...op, status: "SUCCESS" }
-              : op
-          )
-        );
-
-        return { success: true };
       } catch (error) {
-        // Rollback
-        setCart({
-          items: initialItems,
-          total: calculateTotal(initialItems),
-          version: initialVersion,
-        });
+        // Rollback on failure
+        setCart((currentCart) => ({
+          items: previousItems,
+          version: currentCart.version + 1,
+        }));
 
-        setErrors((prev) => [
-          ...prev,
-          {
-            message: error instanceof Error ? error.message : "Unknown error",
-            operation,
-            timestamp: Date.now(),
+        addToast({
+          type: "error",
+          message: "Failed to update cart",
+          action: {
+            label: "Retry",
+            onClick: () => updateQuantity(id, quantity),
           },
-        ]);
-
-        setPendingOperations((prev) =>
-          prev.map((op) =>
-            op.timestamp === operation.timestamp
-              ? { ...op, status: "FAILED" }
-              : op
-          )
-        );
-
-        throw error;
+        });
       } finally {
-        setLoadingCounter((c) => c - 1);
+        decrementLoading();
       }
     },
-    [cart, calculateTotal, serverActions]
+    [cart.items, serverActions, addToast, incrementLoading, decrementLoading]
   );
 
-  // Remove item from cart
   const removeItem = useCallback(
-    async (itemId: string) => {
-      const item = cart.items.find((i) => i.id === itemId);
-      if (!item) return;
+    async (id: string) => {
+      incrementLoading();
 
-      const operation: CartOperation = {
-        type: "REMOVE",
-        item,
-        timestamp: Date.now(),
-        status: "PENDING",
-      };
+      const previousItems = cart.items;
+      const removedItem = cart.items.find((item) => item.id === id);
 
-      setPendingOperations((prev) => [...prev, operation]);
-      setLoadingCounter((c) => c + 1);
-
-      const initialVersion = cart.version;
-      const initialItems = [...cart.items];
+      // Optimistic update
+      setCart((currentCart) => ({
+        items: currentCart.items.filter((item) => item.id !== id),
+        version: currentCart.version + 1,
+      }));
 
       try {
-        // Optimistically update the cart
-        setCart((prevCart) => {
-          const filteredItems = prevCart.items.filter((i) => i.id !== itemId);
-          return {
-            ...prevCart,
-            items: filteredItems,
-            total: calculateTotal(filteredItems),
-            version: prevCart.version + 1,
-          };
-        });
+        const result = await serverActions.removeItem(id);
 
-        // Server update
-        const result = await serverActions.removeFromCart(itemId);
-        if (!result?.success) {
-          throw new Error("Server update failed");
+        if (result.success) {
+          addToast({
+            type: "success",
+            message: "Item removed from cart",
+            duration: 3000,
+          });
+        } else {
+          throw new Error("Failed to remove item");
         }
-
-        setPendingOperations((prev) =>
-          prev.map((op) =>
-            op.timestamp === operation.timestamp
-              ? { ...op, status: "SUCCESS" }
-              : op
-          )
-        );
-
-        return { success: true };
       } catch (error) {
-        // Rollback
-        setCart({
-          items: initialItems,
-          total: calculateTotal(initialItems),
-          version: initialVersion,
-        });
+        // Rollback on failure
+        setCart((currentCart) => ({
+          items: previousItems,
+          version: currentCart.version + 1,
+        }));
 
-        setErrors((prev) => [
-          ...prev,
-          {
-            message: error instanceof Error ? error.message : "Unknown error",
-            operation,
-            timestamp: Date.now(),
+        addToast({
+          type: "error",
+          message: "Failed to remove item",
+          action: {
+            label: "Retry",
+            onClick: () => removedItem && removeItem(id),
           },
-        ]);
-
-        setPendingOperations((prev) =>
-          prev.map((op) =>
-            op.timestamp === operation.timestamp
-              ? { ...op, status: "FAILED" }
-              : op
-          )
-        );
-
-        throw error;
+        });
       } finally {
-        setLoadingCounter((c) => c - 1);
+        decrementLoading();
       }
     },
-    [cart, calculateTotal, serverActions]
+    [cart.items, serverActions, addToast, incrementLoading, decrementLoading]
   );
 
   return {
     cart,
-    pendingOperations,
-    errors,
     isLoading,
     addItem,
     updateQuantity,

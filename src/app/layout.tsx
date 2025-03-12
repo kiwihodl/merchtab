@@ -6,8 +6,13 @@ import Footer from "@/components/layout/footer";
 import { CartProvider } from "@/components/cart/cart-context";
 import { cookies } from "next/headers";
 import { getCart } from "@/app/lib/shopify";
+import { ToastProvider } from "./lib/components/toast/ToastProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "Sovereign University",

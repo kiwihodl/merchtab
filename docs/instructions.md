@@ -29,29 +29,69 @@
 
 Before pushing any changes to GitHub and deploying to Vercel, always follow these steps in order:
 
-1. Test locally with development server:
+1. Run Automated Tests:
 
    ```bash
-   npm run dev
+   npm test
    ```
 
-   - Verify all changes work as expected
-   - Test all affected functionality
-   - Check for any console errors
+   - All tests must pass
+   - No skipped or pending tests
+   - Check test coverage for new features
+   - ⚠️ DO NOT proceed if any tests fail
 
-2. Test production build locally:
+2. Build Production Version:
 
    ```bash
    npm run build
    ```
 
-   - Ensure build completes successfully
-   - Check for any build errors or warnings
-   - Verify static generation works as expected
+   - Build must complete without errors
+   - Address all build warnings
+   - Verify static generation
+   - ⚠️ DO NOT proceed if build fails
 
-3. Only after both steps above pass:
+3. Manual QA Testing:
+
+   First, provide a clear QA testing plan that includes:
+
+   - List of features to test
+   - Expected behaviors
+   - Edge cases to verify
+   - Specific user interactions to test
+   - Any known limitations or areas of concern
+
+   Then run development server:
+
+   ```bash
+   npm run dev
+   ```
+
+   Execute the QA plan, checking:
+
+   - All modified features work as expected
+   - No regressions in existing functionality
+   - Client and server components behave correctly
+   - Console is free of errors and warnings
+   - Performance is acceptable
+   - Mobile and desktop views work correctly
+
+4. User Confirmation:
+
+   - Present QA results to user
+   - List any issues found and their resolutions
+   - Get explicit user approval to proceed
+   - ⚠️ DO NOT proceed without user confirmation
+
+5. Only after user approval:
    - Commit changes to GitHub
    - Push to repository
    - Deploy on Vercel
 
-⚠️ Never skip these steps or push directly to GitHub without local verification.
+⚠️ CRITICAL CHECKPOINTS:
+
+- Tests MUST pass before building
+- Build MUST succeed before QA
+- QA MUST be completed with a clear test plan
+- User MUST approve before pushing to GitHub
+- NEVER skip steps or push without verification
