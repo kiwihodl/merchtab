@@ -26,8 +26,8 @@ export async function generateMetadata({
   // Get the first available image if featured image is not set
   const firstImage = product.images[0];
   const imageUrl = url || firstImage?.url;
-  const imageWidth = width || firstImage?.width;
-  const imageHeight = height || firstImage?.height;
+  const imageWidth = 1200; // Force standard social media width
+  const imageHeight = 630; // Force standard social media height
   const imageAlt = alt || firstImage?.altText || product.title;
 
   return {
@@ -53,6 +53,9 @@ export async function generateMetadata({
               width: imageWidth,
               height: imageHeight,
               alt: imageAlt,
+              // Add Shopify image transformation parameters to show the full product
+              // ?width=1200&height=630&crop=top ensures we get the top portion of the image
+              secureUrl: `${imageUrl}?width=1200&height=630&crop=top`,
             },
           ]
         : [],
@@ -64,7 +67,8 @@ export async function generateMetadata({
       creator: "@SovereignUni",
       title: product.seo.title || product.title,
       description: product.seo.description || product.description,
-      images: imageUrl ? [imageUrl] : [],
+      // Add the same image transformation for Twitter
+      images: imageUrl ? [`${imageUrl}?width=1200&height=630&crop=top`] : [],
     },
   };
 }
