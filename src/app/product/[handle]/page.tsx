@@ -35,8 +35,8 @@ export async function generateMetadata({
   const imageAlt =
     featuredImage?.altText || firstImage?.altText || product.title;
 
-  // Show full product image with black padding to maintain aspect ratio
-  const socialImageUrl = `${imageUrl}&width=1200&height=630&fit=contain&background=000000`;
+  // Use Shopify's CDN parameters
+  const socialImageUrl = `${imageUrl}?width=1200&height=630&format=jpg&fit=bounds`;
 
   return {
     title: product.seo.title || product.title,
