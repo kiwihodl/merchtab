@@ -118,6 +118,15 @@ export default async function ProductPage({
   const product = await getProduct(params.handle);
   if (!product) return notFound();
 
+  // Add debug info
+  const debugInfo = {
+    featuredImage: product.featuredImage?.url,
+    firstImage: product.images[0]?.url,
+    totalImages: product.images.length,
+    allImageUrls: product.images.map((img) => img.url),
+    openGraphImage: `${product.featuredImage?.url || product.images[0]?.url}?width=1200&height=630&crop=top`,
+  };
+
   const showDebug = searchParams?.debug === "true";
 
   return (
