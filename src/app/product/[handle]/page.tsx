@@ -35,8 +35,8 @@ export async function generateMetadata({
   const imageAlt =
     featuredImage?.altText || firstImage?.altText || product.title;
 
-  // Scale product image to 630px height and center it on 1200x630 white canvas
-  const socialImageUrl = `${imageUrl}?width=630&height=630&background=ffffff&format=jpg`;
+  // Force 1200x630 canvas with scaled product image centered
+  const socialImageUrl = `${imageUrl}?width=630&height=630&canvas=1200x630&format=jpg&background=ffffff`;
 
   return {
     title: product.seo.title || product.title,
