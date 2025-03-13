@@ -83,7 +83,7 @@ export function AddToCart({ product }: { product: Product }) {
       try {
         addCartItem(finalVariant, product);
       } catch (error) {
-        console.error("Error adding item to cart:", error);
+        // console.error("Error adding item to cart:", error);
       }
     });
   };

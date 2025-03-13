@@ -16,7 +16,7 @@ export async function addItem(prevState: any, selectedVariantId: string) {
   let cartId = cookies().get("cartId")?.value;
 
   if (!selectedVariantId) {
-    console.error("Missing variant ID");
+    // console.error("Missing variant ID");
     return "Missing variant ID";
   }
 
@@ -33,7 +33,7 @@ export async function addItem(prevState: any, selectedVariantId: string) {
     revalidateTag(TAGS.cart);
     return null;
   } catch (error) {
-    console.error("Error adding item to cart:", error);
+    // console.error("Error adding item to cart:", error);
     return "Error adding item to cart";
   }
 }
@@ -79,7 +79,7 @@ export async function updateItemQuantity(
     revalidateTag(TAGS.cart);
     return null;
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     return "Error updating item quantity";
   }
 }
@@ -113,7 +113,7 @@ export async function removeItem(prevState: any, merchandiseId: string) {
 
     return "Item not found in cart";
   } catch (error) {
-    console.error("Error removing item from cart:", error);
+    // console.error("Error removing item from cart:", error);
     return "Error removing item from cart";
   }
 }

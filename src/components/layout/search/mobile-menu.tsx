@@ -61,7 +61,7 @@ export default function MobileMenu() {
         const data = await response.json();
         setCollections(data);
       } catch (error) {
-        console.error("Error fetching collections:", error);
+        // console.error("Error fetching collections:", error);
       }
     }
     fetchCollections();

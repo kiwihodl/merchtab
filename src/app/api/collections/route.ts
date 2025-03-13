@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const collections = await getCollections();
+    // console.log("Collections API response:", collections);
 
     // Always include "All" collection
     const allCollection = {
@@ -33,10 +34,10 @@ export async function GET() {
               products,
             };
           } catch (error) {
-            console.error(
-              `Error fetching products for collection ${collection.handle}:`,
-              error
-            );
+            // console.error(
+            //   `Error fetching products for collection ${collection.handle}:`,
+            //   error
+            // );
             return {
               ...collection,
               hasProducts: false,
@@ -56,7 +57,7 @@ export async function GET() {
 
     return NextResponse.json(allCollections);
   } catch (error) {
-    console.error("Error fetching collections:", error);
+    // console.error("Error in collections API:", error);
     // Even if there's an error, return at least the "All" collection
     return NextResponse.json([
       {

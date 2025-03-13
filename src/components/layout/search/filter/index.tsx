@@ -6,7 +6,7 @@ export type PathFilterItem = { title: string; path: string };
 export type ListItem = SortFilterItem | PathFilterItem;
 
 function FilterItemList({ list }: { list: ListItem[] }) {
-  console.log("FilterItemList is being rendered with list:", list);
+  // console.log("FilterItemList is being rendered with list:", list);
   return (
     <>
       {list.map((item: ListItem, i) => (
@@ -23,12 +23,12 @@ export default function FilterList({
   list: ListItem[];
   title?: string;
 }) {
-  console.log(
-    "FilterList is being rendered with title:",
-    title,
-    "and list:",
-    list
-  );
+  // console.log(
+  //   "FilterList is being rendered with title:",
+  //   title,
+  //   "and list:",
+  //   list
+  // );
   return (
     <nav className="w-full">
       {title ? (

@@ -8,12 +8,12 @@ export default function ProductGridItems({
 }: {
   products: Product[];
 }) {
-  console.log("ProductGridItems received products:", products);
+  // console.log("ProductGridItems received products:", products);
 
   return (
     <>
       {products.map((product) => {
-        console.log("Rendering product:", product.title, product.handle);
+        // console.log("Rendering product:", product.title, product.handle);
         return (
           <Grid.Item key={product.handle} className="animate-fadeIn">
             <Link

@@ -59,7 +59,7 @@ type ExtractVariables<T> = T extends { variables: object }
   : never;
 
 export async function shopifyFetch<T>({
-  cache = "force-cache",
+  cache,
   headers,
   query,
   tags,
@@ -73,14 +73,14 @@ export async function shopifyFetch<T>({
   variables?: ExtractVariables<T>;
   next?: { revalidate?: number };
 }): Promise<{ status: number; body: T } | never> {
-  console.log("Shopify API config:", {
-    endpoint,
-    hasKey: !!key,
-    cache,
-    tags,
-    next,
-    query: query.slice(0, 100) + "...", // Log first 100 chars of query
-  });
+  // console.log("Shopify API config:", {
+  //   endpoint,
+  //   hasKey: !!key,
+  //   cache,
+  //   tags,
+  //   next,
+  //   query: query.slice(0, 100) + "...",
+  // });
 
   try {
     const result = await fetch(endpoint, {
@@ -94,31 +94,27 @@ export async function shopifyFetch<T>({
         ...(query && { query }),
         ...(variables && { variables }),
       }),
-      cache,
-      ...(tags && { next: { tags, ...(next || {}) } }),
+      ...(next?.revalidate
+        ? { next: { revalidate: next.revalidate } }
+        : { cache: cache || "force-cache" }),
+      ...(tags && { next: { tags } }),
     });
 
-    console.log("Shopify API response status:", result.status);
+    // console.log("Shopify API response status:", result.status);
     const body = await result.json();
 
     if (body.errors) {
-      console.error(
-        "Shopify API errors:",
-        JSON.stringify(body.errors, null, 2)
-      );
+      // console.error("Shopify API errors:", JSON.stringify(body.errors, null, 2));
       throw body.errors[0];
     }
 
-    console.log(
-      "Shopify API response data keys:",
-      Object.keys(body.data || {})
-    );
+    // console.log("Shopify API response data keys:", Object.keys(body.data || {}));
     return {
       status: result.status,
       body,
     };
   } catch (error) {
-    console.error("Shopify fetch error:", error);
+    // console.error("Shopify fetch error:", error);
     if (isShopifyError(error)) {
       throw {
         cause: error.cause?.toString() || "unknown",
@@ -160,10 +156,10 @@ function reshapeProduct(
     return undefined;
   }
 
-  console.log(`Product ${product.title} tags:`, product.tags);
+  // console.log(`Product ${product.title} tags:`, product.tags);
 
   if (filterHiddenProducts && product.tags.includes(HIDDEN_PRODUCT_TAG)) {
-    console.log(`Product ${product.title} filtered due to hidden tag`);
+    // console.log(`Product ${product.title} filtered due to hidden tag`);
     return undefined;
   }
 
@@ -221,7 +217,7 @@ export async function getProducts({
   reverse?: boolean;
   sortKey?: string;
 }): Promise<Product[]> {
-  console.log("Getting products with params:", { query, reverse, sortKey });
+  // console.log("Getting products with params:", { query, reverse, sortKey });
 
   const res = await shopifyFetch<ShopifyProductsOperation>({
     query: getProductsQuery,
@@ -234,17 +230,17 @@ export async function getProducts({
     cache: "no-store",
   });
 
-  console.log(
-    "Products response count:",
-    res.body?.data?.products?.edges?.length || 0
-  );
+  // console.log(
+  //   "Products response count:",
+  //   res.body?.data?.products?.edges?.length || 0
+  // );
 
   const products = removeEdgesAndNodes(res.body.data.products);
   const reshapedProducts = products.map((product) =>
     reshapeProduct(product, false)
   );
 
-  console.log("Final products count:", reshapedProducts.filter(Boolean).length);
+  // console.log("Final products count:", reshapedProducts.filter(Boolean).length);
 
   return reshapedProducts.filter(
     (product): product is Product => product !== undefined
@@ -330,7 +326,7 @@ export async function getCollectionProducts({
   });
 
   if (!res.body.data.collection) {
-    console.log(`No collection found for \`${collection}\``);
+    // console.log(`No collection found for \`${collection}\``);
     return [];
   }
 
@@ -340,7 +336,7 @@ export async function getCollectionProducts({
 }
 
 export async function getProduct(handle: string): Promise<Product | undefined> {
-  console.log("Fetching product with handle:", handle);
+  // console.log("Fetching product with handle:", handle);
 
   const res = await shopifyFetch<ShopifyProductOperation>({
     query: getProductQuery,
@@ -354,10 +350,10 @@ export async function getProduct(handle: string): Promise<Product | undefined> {
     },
   });
 
-  console.log(
-    "Product query response:",
-    JSON.stringify(res.body?.data?.product || null, null, 2)
-  );
+  // console.log(
+  //   "Product query response:",
+  //   JSON.stringify(res.body?.data?.product || null, null, 2)
+  // );
 
   return reshapeProduct(res.body.data.product, false);
 }
