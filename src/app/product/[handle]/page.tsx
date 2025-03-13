@@ -108,6 +108,7 @@ export default async function ProductPage({
                     src: image.url,
                     altText: image.altText,
                   }))}
+                  variants={product.variants}
                 />
               </Suspense>
             </div>

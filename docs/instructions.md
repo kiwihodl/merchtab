@@ -25,6 +25,31 @@
 4. Write clean, maintainable code
 5. Document significant changes
 
+## Development Best Practices
+
+### 1. Codebase Search
+
+- Always use codebase_search with target directories first
+- Check existing system files before creating new ones
+- List cursor rules before debugging
+
+### 2. Output Format Handling
+
+- Follow specified output formats exactly
+- Continue within pre-seeded answer structures
+- Deliver responses in minimal yet complete form
+
+### 3. Code Generation
+
+- Adhere to language-specific best practices
+- Maintain clarity and maintainability
+- Handle private data securely
+
+## Request Handling
+
+- For ambiguous requests, ask clarifying questions if allowed
+- If not allowed, state briefly that more information is needed
+
 ## Deployment Workflow
 
 Before pushing any changes to GitHub and deploying to Vercel, always follow these steps in order:
