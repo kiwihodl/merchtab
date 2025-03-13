@@ -12,16 +12,17 @@ type Combination = {
 };
 
 export default function VariantSelector({
-  options,
-  variants,
+  options = [],
+  variants = [],
 }: {
-  options: ProductOption[];
-  variants: ProductVariant[];
+  options?: ProductOption[];
+  variants?: ProductVariant[];
 }) {
   const { state, updateOption } = useProduct();
 
   // Set default size to M if available
   React.useEffect(() => {
+    if (!options?.length) return;
     const sizeOption = options.find((opt) => opt.name.toLowerCase() === "size");
     if (sizeOption) {
       const mediumSize = sizeOption.values.find((v) => v.toLowerCase() === "m");
@@ -31,8 +32,31 @@ export default function VariantSelector({
     }
   }, [options, state, updateOption]);
 
+  // Set default color to first available color
+  React.useEffect(() => {
+    if (!options?.length || !variants?.length) return;
+    const colorOption = options.find(
+      (opt) => opt.name.toLowerCase() === "color"
+    );
+    if (colorOption && !state["color"]) {
+      // Find the first available color variant
+      const firstAvailableColor = colorOption.values.find((color) => {
+        return variants.some((variant) => {
+          const variantColor = variant.selectedOptions.find(
+            (opt) => opt.name.toLowerCase() === "color"
+          )?.value;
+          return variantColor === color && variant.availableForSale;
+        });
+      });
+
+      if (firstAvailableColor) {
+        updateOption("color", firstAvailableColor);
+      }
+    }
+  }, [options, state, updateOption, variants]);
+
   const hasNoOptionsOrJustOneOption =
-    !options.length ||
+    !options?.length ||
     (options.length === 1 && options[0]?.values.length === 1);
 
   if (hasNoOptionsOrJustOneOption) {
@@ -77,18 +101,16 @@ export default function VariantSelector({
                 title={`${option.name} ${value}${
                   !isAvailableForSale ? " (Out of Stock)" : ""
                 }`}
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={() => {
                   updateOption(optionNameLowerCase, value);
                 }}
                 className={clsx(
-                  "flex min-w-[48px] items-center justify-center rounded-full border px-2 py-1 text-sm",
+                  "flex min-w-[48px] items-center justify-center rounded-full border bg-neutral-100 px-2 py-1 text-sm dark:border-neutral-800 dark:bg-neutral-900",
                   {
-                    "cursor-default border-accent bg-accent text-black":
-                      isActive,
-                    "border-neutral-200 bg-neutral-100 text-black hover:border-accent dark:border-neutral-800 dark:bg-neutral-900 dark:text-white":
+                    "ring-2 ring-[var(--accent-color,#FF9500)]": isActive,
+                    "ring-1 ring-transparent transition duration-300 ease-in-out hover:scale-110 hover:ring-[var(--accent-color,#FF9500)]":
                       !isActive && isAvailableForSale,
-                    "relative z-10 cursor-not-allowed overflow-hidden border-neutral-300 bg-neutral-100 text-neutral-500 before:absolute before:inset-x-0 before:-z-10 before:h-px before:-rotate-45 before:bg-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-400 before:dark:bg-neutral-700":
+                    "relative z-10 cursor-not-allowed overflow-hidden bg-neutral-100 text-neutral-500 ring-1 ring-neutral-300 before:absolute before:inset-x-0 before:-z-10 before:h-px before:-rotate-45 before:bg-neutral-300 before:transition-transform dark:bg-neutral-900 dark:text-neutral-400 dark:ring-neutral-700 before:dark:bg-neutral-700":
                       !isAvailableForSale,
                   }
                 )}

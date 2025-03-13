@@ -1,5 +1,5 @@
 import { GridTileImage } from "@/components/grid/tile";
-import Gallery from "@/components/product/gallery";
+import { Gallery } from "@/components/product/gallery";
 import { ProductProvider } from "@/components/product/product-context";
 import { ProductDescription } from "@/components/product/product-description";
 import { HIDDEN_PRODUCT_TAG } from "@/app/lib/constants";
@@ -10,6 +10,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { ProductGallery } from "@/components/product/product-gallery";
 
 export async function generateMetadata({
   params,
@@ -86,27 +87,27 @@ export default async function ProductPage({
         <div className="flex flex-col rounded-2xl bg-black p-8 md:p-12 relative">
           <Link
             href="/"
-            className="absolute -left-2 -top-4 p-4 text-white hover:text-accent transition-colors"
+            className="absolute -left-2 top-7 md:top-14 p-4 text-white hover:text-accent transition-colors"
             aria-label="Back to shop"
           >
             <ArrowLeftIcon className="h-6 w-6" />
           </Link>
-          <div className="mb-8 lg:hidden">
-            <h1 className="text-5xl font-medium text-white text-center">
-              {product.title}
-            </h1>
-          </div>
           <div className="flex flex-col lg:flex-row lg:gap-8">
             <div className="h-full w-full basis-full lg:basis-4/6">
+              <div className="mb-2 md:mb-3 -mb-4 md:-mb-6">
+                <h1 className="text-4xl md:text-5xl font-medium text-white text-center">
+                  {product.title}
+                </h1>
+              </div>
               <Suspense
                 fallback={
                   <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden rounded-2xl" />
                 }
               >
-                <Gallery
-                  images={product.images.slice(0, 5).map((image: Image) => ({
+                <ProductGallery
+                  images={product.images.map((image: Image) => ({
                     src: image.url,
-                    altText: image.altText,
+                    name: image.altText || "Product image",
                   }))}
                   variants={product.variants}
                 />

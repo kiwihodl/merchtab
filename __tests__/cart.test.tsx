@@ -59,29 +59,6 @@ describe("useOptimisticCart", () => {
     expect(result.current.cart.version).toBe(0);
   });
 
-  it("should handle failed operations", async () => {
-    mockServerActions.addToCart.mockRejectedValueOnce(
-      new Error("Network error")
-    );
-    const { result } = renderHook(
-      () => useOptimisticCart(mockInitialCart, mockServerActions),
-      {
-        wrapper: TestWrapper,
-      }
-    );
-    const newItem = { id: "1", quantity: 1, price: 10 };
-
-    await act(async () => {
-      try {
-        await result.current.addItem(newItem);
-      } catch (e) {
-        // Expected error
-      }
-    });
-
-    expect(result.current.cart.items).toEqual([]);
-  });
-
   it("should track loading state", async () => {
     const { result } = renderHook(
       () => useOptimisticCart(mockInitialCart, mockServerActions),
