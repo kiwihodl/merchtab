@@ -1,31 +1,4 @@
 export const theme = {
-  colors: {
-    // Brand Colors
-    primary: "#000000", // Default black
-    accent: "#FF9500", // Bitcoin orange
-
-    // Text Colors
-    text: {
-      primary: "#FFFFFF", // White text for dark mode
-      secondary: "#9CA3AF", // Neutral gray for secondary text
-      muted: "#6B7280", // Muted text color
-    },
-
-    // Background Colors
-    background: {
-      primary: "#000000", // Dark mode background
-      secondary: "#1F2937", // Slightly lighter dark background
-      hover: "#374151", // Hover state background
-    },
-
-    // Border Colors
-    border: {
-      default: "#374151", // Default border color
-      hover: "#FF9500", // Border color on hover (accent)
-      active: "#FF9500", // Border color for active states (accent)
-    },
-  },
-
   // Typography
   fonts: {
     body: "Blinker, sans-serif", // Default body font

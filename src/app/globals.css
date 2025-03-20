@@ -2,29 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-:focus-visible {
-  outline: 2px solid #0066cc;
-  outline-offset: 2px;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  .modal__close:hover,
-  .modal__nav:hover {
-    color: rgba(255, 255, 255, 0.5);
+@layer utilities {
+  @supports (font: -apple-system-body) and (-webkit-appearance: none) {
+    img[loading="lazy"] {
+      clip-path: inset(0.6px);
+    }
   }
 }
 
-@supports (font: -apple-system-body) and (-webkit-appearance: none) {
-  img[loading="lazy"] {
-    clip-path: inset(0.6px);
+@layer base {
+  :focus-visible {
+    @apply outline-2 outline-accent outline-offset-2;
   }
 }
 
-a,
-input,
-button {
-  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-neutral-600 dark:focus-visible:ring-offset-neutral-900;
+@layer components {
+  a,
+  input,
+  button {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-neutral-600 dark:focus-visible:ring-offset-neutral-900;
+  }
 }

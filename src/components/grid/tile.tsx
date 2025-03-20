@@ -36,6 +36,12 @@ export function GridTileImage({
               isInteractive,
           })}
           alt={props.alt || "Product image"}
+          quality={75}
+          placeholder="blur"
+          blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+            '<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="400" fill="#CCCCCC"/></svg>'
+          ).toString("base64")}`}
+          sizes="(min-width: 1024px) 20vw, (min-width: 768px) 25vw, (min-width: 640px) 33vw, (min-width: 475px) 50vw, 100vw"
         />
       ) : null}
       {label ? (

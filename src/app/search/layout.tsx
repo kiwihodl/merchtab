@@ -15,9 +15,7 @@ export default function SearchLayout({
           <div className="bg-black p-4">
             <FilterList list={sorting} title="Sort by" />
             <div className="mt-8">
-              <div className="-mx-4 -mt-4">
-                <Collections />
-              </div>
+              <Collections />
             </div>
           </div>
         </div>
