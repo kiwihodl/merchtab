@@ -132,9 +132,8 @@ export async function removeItem(prevState: any, merchandiseId: string) {
 //   redirect(cart.checkoutUrl);
 // }
 
-export async function redirectToCheckout(formData: FormData): Promise<void> {
-  const cartId =
-    formData.get("cartId")?.toString() || cookies().get("cartId")?.value;
+export async function redirectToCheckout(): Promise<void> {
+  const cartId = cookies().get("cartId")?.value;
   if (!cartId) {
     throw new Error("Missing cart ID");
   }

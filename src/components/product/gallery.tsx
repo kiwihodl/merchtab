@@ -8,7 +8,6 @@ import {
 import Image from "next/image";
 import { useTransition, useState, useRef, useEffect } from "react";
 import { clsx } from "clsx";
-import styles from "./gallery.module.css";
 import { ProductVariant } from "@/app/lib/shopify/types";
 
 interface Image {
@@ -142,9 +141,9 @@ export function Gallery({
       <Image
         src={image.src}
         alt={image.name}
-        width={1200}
-        height={800}
-        className={`${isModal ? styles.modal__media : ""} rounded-2xl`}
+        width={isModal ? 1200 : 800}
+        height={isModal ? 800 : 600}
+        className="rounded-2xl"
         style={{
           width: "100%",
           height: "100%",
@@ -152,7 +151,12 @@ export function Gallery({
           borderRadius: "1rem",
         }}
         priority={!isModal}
-        sizes={isModal ? "80vw" : "100vw"}
+        sizes={isModal ? "80vw" : "(min-width: 768px) 50vw, 100vw"}
+        quality={isModal ? 90 : 75}
+        placeholder="blur"
+        blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+          '<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="300" fill="#CCCCCC"/></svg>'
+        ).toString("base64")}`}
         onClick={isModal ? handleZoom : undefined}
       />
     );
@@ -160,16 +164,16 @@ export function Gallery({
 
   if (!selectedVariantImage) {
     return (
-      <div className={styles.placeholder}>
+      <div className="flex items-center justify-center h-full w-full">
         <span>No media available</span>
       </div>
     );
   }
 
   return (
-    <div className={styles.gallery}>
+    <div className="flex flex-col gap-2 w-full max-w-[550px] mx-auto mb-8">
       <div
-        className={styles.main_media}
+        className="relative w-full aspect-[3/4] max-w-[550px] mx-auto overflow-hidden cursor-pointer rounded-2xl"
         role="button"
         tabIndex={0}
         onClick={() => setIsModalOpen(true)}
@@ -177,16 +181,19 @@ export function Gallery({
         aria-label="main media"
       >
         {pending && (
-          <div className={styles.loading} data-testid="loading">
-            <div className={styles.loading__spinner} />
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-black/50"
+            data-testid="loading"
+          >
+            <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
           </div>
         )}
         <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden rounded-2xl mt-12 md:mt-20">
           <Image
             src={selectedVariantImage.src}
             alt={selectedVariantImage.name}
-            width={1200}
-            height={800}
+            width={800}
+            height={600}
             className="rounded-2xl"
             style={{
               maxWidth: "100%",
@@ -194,16 +201,21 @@ export function Gallery({
               objectFit: "contain",
             }}
             priority={true}
-            sizes="100vw"
+            sizes="(min-width: 768px) 50vw, 100vw"
+            quality={75}
+            placeholder="blur"
+            blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+              '<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="300" fill="#CCCCCC"/></svg>'
+            ).toString("base64")}`}
           />
         </div>
       </div>
 
       {images.length > 1 && (
-        <div className={styles.slider_container}>
+        <div className="relative w-full px-10 -mt-4">
           {images.length > 3 && (
             <button
-              className={`${styles.slider__nav} ${styles.slider__nav_prev}`}
+              className="absolute top-1/2 -translate-y-1/2 left-0 w-8 h-8 flex items-center justify-center bg-black/50 border-none rounded-full text-white cursor-pointer transition-colors hover:bg-black/70 z-10"
               onClick={() => {
                 if (sliderRef.current) {
                   const scrollAmount = sliderRef.current.offsetWidth * 0.8;
@@ -222,13 +234,20 @@ export function Gallery({
               <ArrowLeftIcon className="h-5 w-5" />
             </button>
           )}
-          <div className={styles.slider} ref={sliderRef} role="list">
+          <div
+            className="snap-x snap-mandatory scrollbar-none scroll-smooth flex gap-2 py-2 overflow-x-auto justify-center"
+            ref={sliderRef}
+            role="list"
+          >
             {images.map((image) => (
               <button
                 key={image.src}
-                className={`${styles.slider__slide} ${
-                  image.src === selectedVariantImage.src ? styles.selected : ""
-                }`}
+                className={clsx(
+                  "flex-shrink-0 w-16 h-16 overflow-hidden border-2 transition-colors rounded-2xl md:w-[4.5rem] md:h-[4.5rem] lg:w-20 lg:h-20",
+                  image.src === selectedVariantImage.src
+                    ? "border-accent"
+                    : "border-transparent hover:border-accent/50"
+                )}
                 onClick={() => handleMediaSelect(image)}
                 aria-label={`View ${image.name}`}
                 aria-current={
@@ -241,7 +260,7 @@ export function Gallery({
           </div>
           {images.length > 3 && (
             <button
-              className={`${styles.slider__nav} ${styles.slider__nav_next}`}
+              className="absolute top-1/2 -translate-y-1/2 right-0 w-8 h-8 flex items-center justify-center bg-black/50 border-none rounded-full text-white cursor-pointer transition-colors hover:bg-black/70 z-10"
               onClick={() => {
                 if (sliderRef.current) {
                   const scrollAmount = sliderRef.current.offsetWidth * 0.8;
@@ -265,44 +284,61 @@ export function Gallery({
 
       {isModalOpen && (
         <div
-          className={styles.modal}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
           ref={modalRef}
           role="dialog"
           aria-label="Media gallery modal"
           onKeyDown={handleKeyDown}
         >
-          <div className={styles.modal__content}>
+          <div className="relative w-full max-w-[80rem] h-full flex items-center justify-center">
             <button
-              className={styles.modal__close}
+              className="absolute right-4 top-4 text-white bg-transparent border-none p-2 cursor-pointer transition-colors hover:text-white/70"
               onClick={handleModalClose}
               aria-label="Close modal"
             >
-              ×
+              <XMarkIcon className="h-6 w-6" />
             </button>
             <div
-              className={styles.touch_area}
+              className="touch-pan-y touch-pinch-zoom cursor-grab active:cursor-grabbing"
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
-              {renderMedia(selectedVariantImage, true)}
+              <Image
+                src={selectedVariantImage.src}
+                alt={selectedVariantImage.name}
+                width={1200}
+                height={800}
+                className={clsx(
+                  "w-full h-full object-contain transition-transform duration-300",
+                  isZoomed && "scale-150"
+                )}
+                priority={false}
+                sizes="80vw"
+                quality={90}
+                placeholder="blur"
+                blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+                  '<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="300" fill="#CCCCCC"/></svg>'
+                ).toString("base64")}`}
+                onClick={handleZoom}
+              />
             </div>
             {currentIndex > 0 && (
               <button
-                className={`${styles.modal__nav} ${styles.modal__nav_prev}`}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-transparent border-none p-2 cursor-pointer transition-colors hover:text-white/70"
                 onClick={() => handleMediaSelect(images[currentIndex - 1])}
                 aria-label="Previous media"
               >
-                ‹
+                <ArrowLeftIcon className="h-6 w-6" />
               </button>
             )}
             {currentIndex < images.length - 1 && (
               <button
-                className={`${styles.modal__nav} ${styles.modal__nav_next}`}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-transparent border-none p-2 cursor-pointer transition-colors hover:text-white/70"
                 onClick={() => handleMediaSelect(images[currentIndex + 1])}
                 aria-label="Next media"
               >
-                ›
+                <ArrowRightIcon className="h-6 w-6" />
               </button>
             )}
           </div>
