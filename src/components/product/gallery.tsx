@@ -201,15 +201,20 @@ export function Gallery({
 
       {images.length > 1 && (
         <div className={styles.slider_container}>
-          {images.length > 2 && (
+          {images.length > 3 && (
             <button
               className={`${styles.slider__nav} ${styles.slider__nav_prev}`}
               onClick={() => {
                 if (sliderRef.current) {
+                  const scrollAmount = sliderRef.current.offsetWidth * 0.8;
                   sliderRef.current.scrollBy({
-                    left: -200,
+                    left: -scrollAmount,
                     behavior: "smooth",
                   });
+                  // If at first image, wrap to last image, otherwise go to previous
+                  const newIndex =
+                    currentIndex === 0 ? images.length - 1 : currentIndex - 1;
+                  handleMediaSelect(images[newIndex]);
                 }
               }}
               aria-label="Previous images"
@@ -217,11 +222,7 @@ export function Gallery({
               <ArrowLeftIcon className="h-5 w-5" />
             </button>
           )}
-          <div
-            className={`${styles.slider} ${images.length <= 2 ? "justify-center" : ""}`}
-            ref={sliderRef}
-            role="list"
-          >
+          <div className={styles.slider} ref={sliderRef} role="list">
             {images.map((image) => (
               <button
                 key={image.src}
@@ -238,15 +239,20 @@ export function Gallery({
               </button>
             ))}
           </div>
-          {images.length > 2 && (
+          {images.length > 3 && (
             <button
               className={`${styles.slider__nav} ${styles.slider__nav_next}`}
               onClick={() => {
                 if (sliderRef.current) {
+                  const scrollAmount = sliderRef.current.offsetWidth * 0.8;
                   sliderRef.current.scrollBy({
-                    left: 200,
+                    left: scrollAmount,
                     behavior: "smooth",
                   });
+                  // If at last image, wrap to first image, otherwise go to next
+                  const newIndex =
+                    currentIndex === images.length - 1 ? 0 : currentIndex + 1;
+                  handleMediaSelect(images[newIndex]);
                 }
               }}
               aria-label="Next images"
