@@ -2,7 +2,7 @@ import { SortFilterItem } from "@/app/lib/constants";
 import { FilterItem } from "./item";
 import FilterItemDropDown from "./dropdown";
 
-export type PathFilterItem = { title: string; path: string };
+export type PathFilterItem = { title: string; path: string; slug: string };
 export type ListItem = SortFilterItem | PathFilterItem;
 
 function FilterItemList({ list }: { list: ListItem[] }) {

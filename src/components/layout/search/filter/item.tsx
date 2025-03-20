@@ -10,28 +10,33 @@ import clsx from "clsx";
 function PathFilterItem({ item }: { item: PathFilterItem }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const active = pathname === item.path;
+  const active =
+    searchParams?.get("collection") === item.slug ||
+    (!searchParams?.get("collection") && item.slug === "all");
   const q = searchParams?.get("q");
 
   const href = createUrl(
     item.path,
     new URLSearchParams({
       ...(q && { q }),
+      ...(item.slug && item.slug.length && { collection: item.slug }),
     })
   );
 
-  const DynamicTag = active ? "p" : Link;
-
   return (
     <li className="mt-4 flex text-neutral-300" key={item.title}>
-      <DynamicTag
-        href={href}
-        className={clsx("w-fit text-xl font-medium hover:text-neutral-100", {
-          "border-b-2 border-accent": active,
-        })}
-      >
-        {item.title}
-      </DynamicTag>
+      <div className="w-full">
+        <Link
+          prefetch={!active ? false : undefined}
+          href={href}
+          className={clsx("text-xl font-medium hover:text-neutral-100", {
+            "text-accent": active,
+            "border-b-2 border-accent": active,
+          })}
+        >
+          {item.title}
+        </Link>
+      </div>
     </li>
   );
 }
@@ -50,19 +55,21 @@ function SortFilterItem({ item }: { item: SortFilterItem }) {
       ...(item.slug && item.slug.length && { sort: item.slug }),
     })
   );
-  const DynamicTag = active ? "p" : Link;
 
   return (
     <li className="mt-4 flex text-neutral-300" key={item.title}>
-      <DynamicTag
-        prefetch={!active ? false : undefined}
-        href={href}
-        className={clsx("w-fit text-xl font-medium hover:text-neutral-100", {
-          "border-b-2 border-accent": active,
-        })}
-      >
-        {item.title}
-      </DynamicTag>
+      <div className="w-full">
+        <Link
+          prefetch={!active ? false : undefined}
+          href={href}
+          className={clsx("text-xl font-medium hover:text-neutral-100", {
+            "text-accent": active,
+            "border-b-2 border-accent": active,
+          })}
+        >
+          {item.title}
+        </Link>
+      </div>
     </li>
   );
 }

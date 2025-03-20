@@ -23,11 +23,17 @@ export async function CollectionList() {
       },
       path: "/search",
       updatedAt: new Date().toISOString(),
+      slug: "all",
     },
-    ...collections.filter(
-      (collection) =>
-        collection.handle === "frontpage" || collection.handle === "men"
-    ),
+    ...collections
+      .filter(
+        (collection) =>
+          collection.handle === "frontpage" || collection.handle === "men"
+      )
+      .map((collection) => ({
+        ...collection,
+        slug: collection.handle,
+      })),
   ];
 
   // console.log("Active collections including 'All':", allCollections);
@@ -42,25 +48,23 @@ const items = "bg-neutral-400 dark:bg-neutral-700";
 export default function Collections() {
   // console.log("Collections component is being rendered");
   return (
-    <div className="w-full">
-      <Suspense
-        fallback={
-          <div className="h-[400px] w-full py-4">
-            <div className={clsx(skeleton, activeAndTitles)} />
-            <div className={clsx(skeleton, activeAndTitles)} />
-            <div className={clsx(skeleton, items)} />
-            <div className={clsx(skeleton, items)} />
-            <div className={clsx(skeleton, items)} />
-            <div className={clsx(skeleton, items)} />
-            <div className={clsx(skeleton, items)} />
-            <div className={clsx(skeleton, items)} />
-            <div className={clsx(skeleton, items)} />
-            <div className={clsx(skeleton, items)} />
-          </div>
-        }
-      >
-        <CollectionList />
-      </Suspense>
-    </div>
+    <Suspense
+      fallback={
+        <div className="h-[400px] w-full py-4">
+          <div className={clsx(skeleton, activeAndTitles)} />
+          <div className={clsx(skeleton, activeAndTitles)} />
+          <div className={clsx(skeleton, items)} />
+          <div className={clsx(skeleton, items)} />
+          <div className={clsx(skeleton, items)} />
+          <div className={clsx(skeleton, items)} />
+          <div className={clsx(skeleton, items)} />
+          <div className={clsx(skeleton, items)} />
+          <div className={clsx(skeleton, items)} />
+          <div className={clsx(skeleton, items)} />
+        </div>
+      }
+    >
+      <CollectionList />
+    </Suspense>
   );
 }
